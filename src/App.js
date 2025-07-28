@@ -5,14 +5,38 @@ import { Home, Leaf, Target, Award, BookOpen, User, Info, CheckCircle, Droplet, 
 const App = () => {
   // State to manage the current active page/view
   const [currentPage, setCurrentPage] = useState('dashboard');
-
+  
+  // Persistent state for habit tracking across all pages
+  const [habitCompletions, setHabitCompletions] = useState(new Set());
+  const [userStats, setUserStats] = useState({
+    currentStreak: 0,
+    longestStreak: 0,
+    totalHabitsCompleted: 0,
+    waterSaved: 0,
+    co2Reduced: 0,
+    joinDate: new Date().toISOString().split('T')[0] // Today's date as join date
+  });
+  const [notification, setNotification] = useState(null);
   // Helper function to render the correct page component
   const renderPage = () => {
     switch (currentPage) {
       case 'dashboard':
-        return <Dashboard />;
+        return <Dashboard 
+          setCurrentPage={setCurrentPage}
+          habitCompletions={habitCompletions}
+          setHabitCompletions={setHabitCompletions}
+          userStats={userStats}
+          setUserStats={setUserStats}
+          notification={notification}
+          setNotification={setNotification}
+        />;
       case 'habits':
-        return <HabitsPage />;
+        return <HabitsPage 
+          habitCompletions={habitCompletions}
+          setHabitCompletions={setHabitCompletions}
+          userStats={userStats}
+          setUserStats={setUserStats}
+        />;
       case 'goals':
         return <GoalsPage />;
       case 'ecoTips':
@@ -20,17 +44,25 @@ const App = () => {
       case 'achievements':
         return <AchievementsPage />;
       case 'profile':
-        return <ProfilePage />;
+        return <ProfilePage userStats={userStats} />;
       case 'about':
         return <AboutPage />;
       case 'marketplace':
         return <MarketplacePage />;
       case 'summary':
-        return <SummaryPage />;
+        return <SummaryPage userStats={userStats} habitCompletions={habitCompletions} />;
       case 'community':
         return <CommunityPage />;
       default:
-        return <Dashboard />;
+        return <Dashboard 
+          setCurrentPage={setCurrentPage}
+          habitCompletions={habitCompletions}
+          setHabitCompletions={setHabitCompletions}
+          userStats={userStats}
+          setUserStats={setUserStats}
+          notification={notification}
+          setNotification={setNotification}
+        />;
     }
   };
 
@@ -137,7 +169,18 @@ const Navbar = ({ setCurrentPage, currentPage }) => {
 };
 
 // Dashboard Page Component
-const Dashboard = () => {
+const Dashboard = ({ 
+  setCurrentPage, 
+  habitCompletions, 
+  setHabitCompletions, 
+  userStats, 
+  setUserStats, 
+  notification, 
+  setNotification 
+}) => {
+  // Local state for eco tip details
+  const [showEcoTipDetails, setShowEcoTipDetails] = useState(null);
+
   const habits = [
     { id: 1, name: 'Reduce Plastic', icon: Recycle, color: 'blue' },
     { id: 2, name: 'Save Water', icon: Droplet, color: 'sky' },
@@ -152,6 +195,7 @@ const Dashboard = () => {
       id: 1,
       title: 'Recycle Right: Know Your Local Rules',
       description: 'Different areas have different recycling guidelines. Check your local municipality website to ensure your items are properly sorted.',
+      fullContent: 'Recycling rules vary significantly by location. Contact your local waste management facility or check your municipality\'s website for specific guidelines. Common recyclables include clean paper, cardboard, aluminum cans, glass bottles, and certain plastics. Remember to rinse containers and remove caps when required. Proper sorting helps ensure materials are actually recycled rather than sent to landfills.',
       icon: Recycle,
       color: 'green',
     },
@@ -159,6 +203,7 @@ const Dashboard = () => {
       id: 2,
       title: 'Conserve Water: Shorten Your Showers',
       description: 'Cutting your shower time by just a few minutes can save gallons of water each week. Install a low-flow showerhead for even more savings.',
+      fullContent: 'A typical shower uses 2.5 gallons of water per minute. By reducing your shower time from 10 to 5 minutes, you can save 12.5 gallons per shower! Over a year, this adds up to thousands of gallons. Additional water-saving tips: fix leaky faucets immediately, turn off water while brushing teeth, and consider collecting shower water while it warms up for watering plants.',
       icon: Droplet,
       color: 'blue',
     },
@@ -166,54 +211,206 @@ const Dashboard = () => {
       id: 3,
       title: 'Energy Saving: Unplug Chargers',
       description: 'Even when not charging a device, plugged-in chargers can draw "phantom" power. Unplug them to save energy and reduce your electricity bill.',
+      fullContent: 'Phantom loads or vampire power can account for up to 10% of your home\'s electricity usage. Common culprits include phone chargers, TVs, computers, and other electronics in standby mode. Use power strips to easily disconnect multiple devices at once, or invest in smart power strips that automatically cut power to devices in standby mode.',
       icon: Lightbulb,
       color: 'yellow',
     },
-  ];
+  ];  // Function to handle habit logging
+  const handleLogHabit = (habitId) => {
+    const newCompletions = new Set(habitCompletions);
+    const habit = habits.find(h => h.id === habitId);
+    
+    if (habitCompletions.has(habitId)) {
+      newCompletions.delete(habitId);
+      setNotification(`${habit.name} unmarked. Keep going!`);
+      
+      // Update stats when habit is unmarked
+      setUserStats(prev => ({
+        ...prev,
+        totalHabitsCompleted: Math.max(0, prev.totalHabitsCompleted - 1),
+        waterSaved: Math.max(0, prev.waterSaved - getHabitImpact(habit.name).water),
+        co2Reduced: Math.max(0, prev.co2Reduced - getHabitImpact(habit.name).co2)
+      }));    } else {
+      newCompletions.add(habitId);
+      const allHabitsWillBeCompleted = newCompletions.size === habits.length;
+      
+      if (allHabitsWillBeCompleted) {
+        setNotification(`🎉 Amazing! All habits completed for today! Streak building! 🌟`);
+      } else {
+        setNotification(`Great job! ${habit.name} completed! 🌱`);
+      }
+        // Update stats when habit is completed
+      const impact = getHabitImpact(habit.name);
+      const newCompletionCount = newCompletions.size;
+      const allHabitsCompleted = newCompletionCount === habits.length;
+      
+      setUserStats(prev => {
+        const newStats = {
+          ...prev,
+          totalHabitsCompleted: prev.totalHabitsCompleted + 1,
+          waterSaved: prev.waterSaved + impact.water,
+          co2Reduced: prev.co2Reduced + impact.co2
+        };
+        
+        // Update streak only if all habits are completed
+        if (allHabitsCompleted && prev.currentStreak === newCompletionCount - 1) {
+          newStats.currentStreak = prev.currentStreak + 1;
+          newStats.longestStreak = Math.max(prev.longestStreak, newStats.currentStreak);
+        } else if (newCompletionCount === 1 && prev.currentStreak === 0) {
+          // Starting a new streak
+          newStats.currentStreak = 0; // Will be 1 when all habits completed
+        }
+        
+        return newStats;
+      });
+    }
+    
+    setHabitCompletions(newCompletions);
+    
+    // Clear notification after 3 seconds
+    setTimeout(() => setNotification(null), 3000);
+  };
 
+  // Function to calculate environmental impact of each habit
+  const getHabitImpact = (habitName) => {
+    const impacts = {
+      'Reduce Plastic': { water: 15, co2: 2.5 },
+      'Save Water': { water: 50, co2: 1.8 },
+      'Compost Waste': { water: 5, co2: 3.2 },
+      'Use Public Transport': { water: 8, co2: 4.5 },
+      'Meat-Free Day': { water: 25, co2: 6.1 },
+      'Unplug Electronics': { water: 2, co2: 2.8 }
+    };
+    return impacts[habitName] || { water: 0, co2: 0 };
+  };
+
+  // Function to handle eco tip "Read More"
+  const handleReadMore = (tipId) => {
+    setShowEcoTipDetails(tipId === showEcoTipDetails ? null : tipId);
+  };
   return (
-    <div className="space-y-6 pb-20 lg:pb-4"> {/* Added padding-bottom for mobile navbar */}
+    <div className="space-y-6 pb-20 lg:pb-4 relative"> {/* Added padding-bottom for mobile navbar */}
       <Header title="Dashboard" />
 
-      {/* Welcome Section */}
+      {/* Notification */}
+      {notification && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-pulse">
+          {notification}
+        </div>
+      )}      {/* Welcome Section */}
       <div className="bg-white p-6 rounded-xl shadow-sm text-center">
         <h2 className="text-3xl font-bold text-green-800 mb-2">Welcome, EcoWarrior!</h2>
         <p className="text-gray-600 text-lg">Your actions make a difference. Let's track your positive impact!</p>
+        
+        {/* Dynamic status messages */}
+        {habitCompletions.size === 0 && (
+          <div className="mt-4 inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full">
+            <Target className="w-5 h-5 mr-2" />
+            <span className="font-medium">Ready to start your eco journey? Complete your first habit!</span>
+          </div>
+        )}
+        
+        {habitCompletions.size > 0 && habitCompletions.size < habits.length && (
+          <div className="mt-4 inline-flex items-center bg-green-100 text-green-800 px-4 py-2 rounded-full">
+            <CheckCircle className="w-5 h-5 mr-2" />
+            <span className="font-medium">{habitCompletions.size} habit{habitCompletions.size !== 1 ? 's' : ''} completed today! Keep going!</span>
+          </div>
+        )}
+        
+        {habitCompletions.size === habits.length && (
+          <div className="mt-4 inline-flex items-center bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full">
+            <Award className="w-5 h-5 mr-2" />
+            <span className="font-medium">🎉 Perfect day! All {habits.length} habits completed!</span>
+          </div>
+        )}
+        
+        {/* Environmental impact summary */}
+        {(userStats.waterSaved > 0 || userStats.co2Reduced > 0) && (
+          <div className="mt-4 text-sm text-gray-600">
+            <p>Your impact so far: <span className="font-semibold text-green-600">{userStats.waterSaved}L water saved</span> & <span className="font-semibold text-green-600">{userStats.co2Reduced.toFixed(1)}kg CO2 reduced</span></p>
+          </div>
+        )}
       </div>
 
       {/* Track Daily Habits Section */}
       <section className="bg-white p-6 rounded-xl shadow-sm">
-        <h2 className="text-2xl font-bold text-green-700 mb-4">Track Daily Habits</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <h2 className="text-2xl font-bold text-green-700 mb-4">Track Daily Habits</h2>        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {habits.map((habit) => (
-            <HabitCard key={habit.id} habit={habit} />
+            <HabitCard 
+              key={habit.id} 
+              habit={habit} 
+              isCompleted={habitCompletions.has(habit.id)}
+              onLogHabit={handleLogHabit}
+            />
           ))}
-        </div>
-        <button className="mt-6 w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200">
+        </div>        <button 
+          onClick={() => setCurrentPage('habits')}
+          className="mt-6 w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200"
+        >
           Add Custom Habit
         </button>
-      </section>
-
-      {/* Progress Dashboard Section */}
+      </section>      {/* Progress Dashboard Section */}
       <section className="bg-white p-6 rounded-xl shadow-sm">
         <h2 className="text-2xl font-bold text-green-700 mb-4">Your Progress Dashboard</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <ProgressChart title="Habit Completion Rate" value="85%" description="Last 7 days" />
-          <ProgressChart title="Current Streak" value="15 Days" description="Longest streak: 22 Days" />
-          <ProgressChart title="Water Saved (Approx.)" value="500 Liters" description="This month" />
-          <ProgressChart title="CO2 Reduced (Approx.)" value="20 kg" description="This month" />
+          <ProgressChart 
+            title="Habit Completion Rate" 
+            value={`${Math.round((habitCompletions.size / habits.length) * 100)}%`} 
+            description={`${habitCompletions.size} of ${habits.length} habits completed today`} 
+          />
+          <ProgressChart 
+            title="Current Streak" 
+            value={userStats.currentStreak === 0 ? "Start Today!" : `${userStats.currentStreak} Days`} 
+            description={userStats.longestStreak > 0 ? `Longest streak: ${userStats.longestStreak} Days` : "Complete all daily habits to build your streak!"} 
+          />
+          <ProgressChart 
+            title="Water Saved" 
+            value={userStats.waterSaved > 0 ? `${userStats.waterSaved} Liters` : "0 Liters"} 
+            description={userStats.waterSaved > 0 ? "Great conservation!" : "Start saving by completing water-related habits"} 
+          />
+          <ProgressChart 
+            title="CO2 Reduced" 
+            value={userStats.co2Reduced > 0 ? `${userStats.co2Reduced.toFixed(1)} kg` : "0 kg"} 
+            description={userStats.co2Reduced > 0 ? "Amazing climate impact!" : "Begin your carbon reduction journey today"} 
+          />
+        </div>
+        
+        {/* Additional Stats */}
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <div className="text-2xl font-bold text-blue-700">{userStats.totalHabitsCompleted}</div>
+            <div className="text-sm text-gray-600">Total Habits Completed</div>
+          </div>
+          <div className="text-center p-4 bg-purple-50 rounded-lg">
+            <div className="text-2xl font-bold text-purple-700">
+              {Math.floor((new Date() - new Date(userStats.joinDate)) / (1000 * 60 * 60 * 24)) + 1}
+            </div>
+            <div className="text-sm text-gray-600">Days Active</div>
+          </div>
+          <div className="text-center p-4 bg-green-50 rounded-lg">
+            <div className="text-2xl font-bold text-green-700">
+              {habitCompletions.size >= habits.length ? "Perfect!" : "In Progress"}
+            </div>
+            <div className="text-sm text-gray-600">Today's Status</div>
+          </div>
         </div>
       </section>
 
       {/* Eco Tips Library Section */}
       <section className="bg-white p-6 rounded-xl shadow-sm">
-        <h2 className="text-2xl font-bold text-green-700 mb-4">Eco Tips for You</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <h2 className="text-2xl font-bold text-green-700 mb-4">Eco Tips for You</h2>        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {ecoTips.map((tip) => (
-            <EcoTipCard key={tip.id} tip={tip} />
+            <EcoTipCard 
+              key={tip.id} 
+              tip={tip} 
+              isExpanded={showEcoTipDetails === tip.id}
+              onReadMore={handleReadMore}
+            />
           ))}
-        </div>
-        <button className="mt-6 w-full bg-emerald-500 text-white py-3 rounded-lg font-semibold hover:bg-emerald-600 transition-colors duration-200">
+        </div>        <button 
+          onClick={() => setCurrentPage('ecoTips')}
+          className="mt-6 w-full bg-emerald-500 text-white py-3 rounded-lg font-semibold hover:bg-emerald-600 transition-colors duration-200"
+        >
           Explore More Tips
         </button>
       </section>
@@ -222,33 +419,75 @@ const Dashboard = () => {
 };
 
 // Habit Card Component
-const HabitCard = ({ habit }) => (
-  <div className="bg-green-50 p-4 rounded-lg flex flex-col items-center text-center shadow-sm hover:shadow-md transition-shadow duration-200">
-    <div className={`p-3 rounded-full bg-${habit.color}-200 text-${habit.color}-700 mb-3`}>
+const HabitCard = ({ habit, isCompleted, onLogHabit }) => (
+  <div className={`p-4 rounded-lg flex flex-col items-center text-center shadow-sm hover:shadow-md transition-all duration-200 ${
+    isCompleted ? 'bg-green-100 ring-2 ring-green-300' : 'bg-green-50'
+  }`}>
+    <div className={`p-3 rounded-full bg-${habit.color}-200 text-${habit.color}-700 mb-3 ${
+      isCompleted ? 'ring-2 ring-green-400' : ''
+    }`}>
       <habit.icon className="w-8 h-8" />
     </div>
     <h3 className="text-lg font-semibold text-gray-800 mb-2">{habit.name}</h3>
-    <button className="bg-green-500 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-green-600 transition-colors duration-200 shadow-md">
-      Log Habit
+    {isCompleted && (
+      <div className="flex items-center text-green-600 mb-2">
+        <CheckCircle className="w-5 h-5 mr-1" />
+        <span className="text-sm font-medium">Completed!</span>
+      </div>
+    )}
+    <button 
+      onClick={() => onLogHabit(habit.id)}
+      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 shadow-md ${
+        isCompleted
+          ? 'bg-green-600 text-white hover:bg-green-700'
+          : 'bg-green-500 text-white hover:bg-green-600'
+      }`}
+    >
+      {isCompleted ? 'Logged ✓' : 'Log Habit'}
     </button>
   </div>
 );
 
 // Progress Chart Placeholder Component
-const ProgressChart = ({ title, value, description }) => (
-  <div className="bg-green-50 p-5 rounded-lg shadow-sm flex flex-col items-center justify-center text-center">
-    <h3 className="text-xl font-semibold text-green-700 mb-2">{title}</h3>
-    <div className="text-4xl font-bold text-green-800 mb-2">{value}</div>
-    <p className="text-gray-600 text-sm">{description}</p>
-    {/* Placeholder for actual chart, could be a simple bar or circle */}
-    <div className="w-full h-4 bg-green-200 rounded-full mt-4 overflow-hidden">
-      <div className="h-full bg-green-500 rounded-full" style={{ width: value }}></div>
+const ProgressChart = ({ title, value, description }) => {
+  // Extract percentage for progress bar
+  const getProgressWidth = () => {
+    if (title === "Habit Completion Rate") {
+      return value; // Already in percentage format
+    } else if (title === "Current Streak") {
+      // For streak, show progress based on whether habits are completed today
+      const numericValue = parseInt(value) || 0;
+      return numericValue > 0 ? "100%" : "0%";
+    } else {
+      // For water and CO2, show progress based on daily goals
+      const numericValue = parseFloat(value) || 0;
+      if (title.includes("Water")) {
+        return `${Math.min((numericValue / 100) * 100, 100)}%`; // 100L daily goal
+      } else if (title.includes("CO2")) {
+        return `${Math.min((numericValue / 10) * 100, 100)}%`; // 10kg daily goal
+      }
+      return "0%";
+    }
+  };
+
+  return (
+    <div className="bg-green-50 p-5 rounded-lg shadow-sm flex flex-col items-center justify-center text-center">
+      <h3 className="text-xl font-semibold text-green-700 mb-2">{title}</h3>
+      <div className="text-4xl font-bold text-green-800 mb-2">{value}</div>
+      <p className="text-gray-600 text-sm mb-4">{description}</p>
+      {/* Dynamic progress bar */}
+      <div className="w-full h-4 bg-green-200 rounded-full overflow-hidden">
+        <div 
+          className="h-full bg-green-500 rounded-full transition-all duration-500 ease-in-out" 
+          style={{ width: getProgressWidth() }}
+        ></div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Eco Tip Card Component
-const EcoTipCard = ({ tip }) => (
+const EcoTipCard = ({ tip, isExpanded, onReadMore }) => (
   <div className="bg-white border border-green-200 p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col">
     <div className="flex items-center mb-3">
       <div className={`p-2 rounded-full bg-${tip.color}-100 text-${tip.color}-600 mr-3`}>
@@ -256,9 +495,14 @@ const EcoTipCard = ({ tip }) => (
       </div>
       <h3 className="text-lg font-semibold text-gray-800">{tip.title}</h3>
     </div>
-    <p className="text-gray-600 text-sm flex-grow">{tip.description}</p>
-    <button className="mt-4 text-green-600 hover:text-green-800 font-medium text-sm self-end">
-      Read More &rarr;
+    <p className="text-gray-600 text-sm flex-grow mb-3">
+      {isExpanded ? tip.fullContent : tip.description}
+    </p>
+    <button 
+      onClick={() => onReadMore(tip.id)}
+      className="text-green-600 hover:text-green-800 font-medium text-sm self-end transition-colors duration-200"
+    >
+      {isExpanded ? 'Show Less ↑' : 'Read More →'}
     </button>
   </div>
 );
@@ -272,20 +516,37 @@ const PagePlaceholder = ({ title, icon: Icon }) => (
   </div>
 );
 
-const HabitsPage = () => {
-  const [habits, setHabits] = useState([
-    { id: 1, name: 'Reduce Plastic', completed: false, streak: 5 },
-    { id: 2, name: 'Save Water', completed: true, streak: 3 },
-    { id: 3, name: 'Compost Waste', completed: false, streak: 0 },
-    { id: 4, name: 'Use Public Transport', completed: true, streak: 7 },
-    { id: 5, name: 'Meat-Free Day', completed: false, streak: 2 },
-    { id: 6, name: 'Unplug Electronics', completed: true, streak: 4 },
-  ]);
+const HabitsPage = ({ habitCompletions, setHabitCompletions, userStats, setUserStats }) => {
+  // Define the same habits as in Dashboard for consistency
+  const habits = [
+    { id: 1, name: 'Reduce Plastic', icon: Recycle, color: 'blue', impact: { water: 5, co2: 2 } },
+    { id: 2, name: 'Save Water', icon: Droplet, color: 'sky', impact: { water: 10, co2: 1 } },
+    { id: 3, name: 'Compost Waste', icon: Flower2, color: 'yellow', impact: { water: 2, co2: 5 } },
+    { id: 4, name: 'Use Public Transport', icon: TrendingUp, color: 'purple', impact: { water: 1, co2: 8 } },
+    { id: 5, name: 'Meat-Free Day', icon: Leaf, color: 'pink', impact: { water: 15, co2: 12 } },
+    { id: 6, name: 'Unplug Electronics', icon: Lightbulb, color: 'orange', impact: { water: 0, co2: 3 } },
+  ];
 
-  const toggleHabit = (id) => {
-    setHabits(habits.map(habit => 
-      habit.id === id ? { ...habit, completed: !habit.completed } : habit
-    ));
+  const toggleHabit = (habitId) => {
+    const newCompletions = new Set(habitCompletions);
+    if (newCompletions.has(habitId)) {
+      newCompletions.delete(habitId);
+    } else {
+      newCompletions.add(habitId);
+    }
+    setHabitCompletions(newCompletions);
+
+    // Update environmental impact stats
+    const habit = habits.find(h => h.id === habitId);
+    if (habit) {
+      const multiplier = newCompletions.has(habitId) ? 1 : -1;
+      setUserStats(prev => ({
+        ...prev,
+        waterSaved: Math.max(0, prev.waterSaved + (habit.impact.water * multiplier)),
+        co2Reduced: Math.max(0, prev.co2Reduced + (habit.impact.co2 * multiplier)),
+        totalHabitsCompleted: prev.totalHabitsCompleted + multiplier
+      }));
+    }
   };
 
   return (
@@ -293,29 +554,28 @@ const HabitsPage = () => {
       <Header title="Track Daily Habits" />
       
       <div className="bg-white p-6 rounded-xl shadow-sm">
-        <h2 className="text-2xl font-bold text-green-700 mb-4">Today's Habits</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <h2 className="text-2xl font-bold text-green-700 mb-4">Today's Habits</h2>        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {habits.map((habit) => (
             <div key={habit.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-green-50 transition-colors">
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => toggleHabit(habit.id)}
                   className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                    habit.completed ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-green-400'
+                    habitCompletions.has(habit.id) ? 'bg-green-500 border-green-500' : 'border-gray-300 hover:border-green-400'
                   }`}
                 >
-                  {habit.completed && <CheckCircle className="w-4 h-4 text-white" />}
+                  {habitCompletions.has(habit.id) && <CheckCircle className="w-4 h-4 text-white" />}
                 </button>
-                <span className={`font-medium ${habit.completed ? 'text-green-700' : 'text-gray-700'}`}>
+                <span className={`font-medium ${habitCompletions.has(habit.id) ? 'text-green-700' : 'text-gray-700'}`}>
                   {habit.name}
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">Streak: {habit.streak} days</span>
+                <span className="text-sm text-gray-500">Impact: {habit.impact.water}L water, {habit.impact.co2}kg CO₂</span>
                 <span className={`px-2 py-1 rounded-full text-xs ${
-                  habit.completed ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                  habitCompletions.has(habit.id) ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
                 }`}>
-                  {habit.completed ? 'Done' : 'Pending'}
+                  {habitCompletions.has(habit.id) ? 'Done' : 'Pending'}
                 </span>
               </div>
             </div>
@@ -448,11 +708,11 @@ const AchievementsPage = () => {
   );
 };
 
-const ProfilePage = () => {
+const ProfilePage = ({ userStats }) => {
   const [profile, setProfile] = useState({
     name: 'EcoWarrior',
     email: 'eco@warrior.com',
-    joinDate: '2025-01-01',
+    joinDate: userStats?.joinDate || '2025-01-01',
     totalPoints: 1250,
     level: 'Green Champion'
   });
@@ -479,11 +739,11 @@ const ProfilePage = () => {
             <div className="text-sm text-gray-600">Total Points</div>
           </div>
           <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-700">23</div>
+            <div className="text-2xl font-bold text-blue-700">{userStats?.totalHabitsCompleted || 0}</div>
             <div className="text-sm text-gray-600">Habits Completed</div>
           </div>
           <div className="text-center p-4 bg-purple-50 rounded-lg">
-            <div className="text-2xl font-bold text-purple-700">7</div>
+            <div className="text-2xl font-bold text-purple-700">{userStats?.currentStreak || 0}</div>
             <div className="text-sm text-gray-600">Current Streak</div>
           </div>
         </div>
@@ -824,7 +1084,18 @@ const MarketplacePage = () => {
   );
 };
 
-const SummaryPage = () => {
+const SummaryPage = ({ userStats, habitCompletions }) => {
+  const habits = [
+    { id: 1, name: 'Reduce Plastic', icon: Recycle, color: 'blue', impact: { water: 5, co2: 2 } },
+    { id: 2, name: 'Save Water', icon: Droplet, color: 'sky', impact: { water: 10, co2: 1 } },
+    { id: 3, name: 'Compost Waste', icon: Flower2, color: 'yellow', impact: { water: 2, co2: 5 } },
+    { id: 4, name: 'Use Public Transport', icon: TrendingUp, color: 'purple', impact: { water: 1, co2: 8 } },
+    { id: 5, name: 'Meat-Free Day', icon: Leaf, color: 'pink', impact: { water: 15, co2: 12 } },
+    { id: 6, name: 'Unplug Electronics', icon: Lightbulb, color: 'orange', impact: { water: 0, co2: 3 } },
+  ];
+
+  const completionRate = habits.length > 0 ? Math.round((habitCompletions.size / habits.length) * 100) : 0;
+
   const weeklyData = [
     { day: 'Mon', habits: 5, co2: 2.5 },
     { day: 'Tue', habits: 6, co2: 3.2 },
@@ -832,7 +1103,7 @@ const SummaryPage = () => {
     { day: 'Thu', habits: 6, co2: 3.0 },
     { day: 'Fri', habits: 5, co2: 2.8 },
     { day: 'Sat', habits: 3, co2: 1.5 },
-    { day: 'Sun', habits: 4, co2: 2.2 },
+    { day: 'Sun', habits: habitCompletions.size, co2: userStats?.co2Reduced || 0 },
   ];
 
   return (
@@ -841,19 +1112,19 @@ const SummaryPage = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-xl shadow-sm text-center">
-          <div className="text-2xl font-bold text-green-700">85%</div>
-          <div className="text-sm text-gray-600">Weekly Completion</div>
+          <div className="text-2xl font-bold text-green-700">{completionRate}%</div>
+          <div className="text-sm text-gray-600">Today's Completion</div>
         </div>
         <div className="bg-white p-4 rounded-xl shadow-sm text-center">
-          <div className="text-2xl font-bold text-blue-700">17.3 kg</div>
+          <div className="text-2xl font-bold text-blue-700">{userStats?.co2Reduced || 0} kg</div>
           <div className="text-sm text-gray-600">CO2 Saved</div>
         </div>
         <div className="bg-white p-4 rounded-xl shadow-sm text-center">
-          <div className="text-2xl font-bold text-purple-700">450L</div>
+          <div className="text-2xl font-bold text-purple-700">{userStats?.waterSaved || 0}L</div>
           <div className="text-sm text-gray-600">Water Saved</div>
         </div>
         <div className="bg-white p-4 rounded-xl shadow-sm text-center">
-          <div className="text-2xl font-bold text-orange-700">7</div>
+          <div className="text-2xl font-bold text-orange-700">{userStats?.currentStreak || 0}</div>
           <div className="text-sm text-gray-600">Current Streak</div>
         </div>
       </div>
