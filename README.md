@@ -85,7 +85,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Your Name - your.email@example.com
 
-Project Link: [https://github.com/yourusername/eco-tracker-app](https://github.com/yourusername/eco-tracker-app)
+Project Link: [https://github.com/chhaviS04/eco-tracker-app](https://github.com/chhaviS04/eco-tracker-app)
 
 ---
 
