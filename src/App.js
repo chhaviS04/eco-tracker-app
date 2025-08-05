@@ -70,14 +70,152 @@ const App = () => {
         />;
     }
   };
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-100 font-inter text-gray-800 flex flex-col lg:flex-row relative overflow-hidden">
+      {/* Animated Background Blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-green-300/30 to-emerald-400/30 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute top-1/2 right-20 w-96 h-96 bg-gradient-to-r from-blue-300/20 to-cyan-400/20 rounded-full blur-3xl animate-float-delayed"></div>
+        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-gradient-to-r from-purple-300/25 to-pink-400/25 rounded-full blur-3xl animate-pulse-slow"></div>
+      </div>
 
-  return (    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 font-inter text-gray-800 flex flex-col lg:flex-row">
       <Sidebar setCurrentPage={setCurrentPage} currentPage={currentPage} />
       <Navbar setCurrentPage={setCurrentPage} currentPage={currentPage} />
 
-      <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+      <main className="flex-1 p-4 lg:p-8 overflow-y-auto relative z-10">
         {renderPage()}
       </main>
+
+      {/* Enhanced Animation Keyframes */}
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          33% { transform: translateY(-20px) rotate(1deg); }
+          66% { transform: translateY(10px) rotate(-1deg); }
+        }
+        @keyframes float-delayed {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          33% { transform: translateY(15px) rotate(-1deg); }
+          66% { transform: translateY(-10px) rotate(1deg); }
+        }
+        @keyframes pulse-slow {
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.05); }
+        }
+        @keyframes slideInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInLeft {
+          from { opacity: 0; transform: translateX(-20px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+          from { opacity: 0; transform: translateX(20px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.9); }
+          to { opacity: 1; transform: scale(1); }
+        }        @keyframes shimmer {
+          0% { background-position: -200px 0; }
+          100% { background-position: calc(200px + 100%) 0; }
+        }        @keyframes fireGlow {
+          0%, 100% { 
+            text-shadow: 0 0 5px rgba(255, 69, 0, 0.8), 0 0 10px rgba(255, 69, 0, 0.6), 0 0 15px rgba(255, 69, 0, 0.4);
+            transform: scale(1);
+          }
+          50% { 
+            text-shadow: 0 0 10px rgba(255, 69, 0, 1), 0 0 20px rgba(255, 69, 0, 0.8), 0 0 30px rgba(255, 69, 0, 0.6);
+            transform: scale(1.1);
+          }
+        }
+        @keyframes celebration {
+          0% { transform: scale(1) rotate(0deg); opacity: 1; }
+          25% { transform: scale(1.2) rotate(90deg); opacity: 0.8; }
+          50% { transform: scale(1.1) rotate(180deg); opacity: 0.9; }
+          75% { transform: scale(1.3) rotate(270deg); opacity: 0.7; }
+          100% { transform: scale(1) rotate(360deg); opacity: 1; }
+        }
+        @keyframes confetti {
+          0% { 
+            transform: translateY(0) rotateZ(0deg);
+            opacity: 1;
+          }
+          100% { 
+            transform: translateY(100vh) rotateZ(720deg);
+            opacity: 0;
+          }
+        }
+        @keyframes bounce-in {
+          0% { transform: scale(0.3) rotate(-45deg); opacity: 0; }
+          50% { transform: scale(1.1) rotate(0deg); opacity: 1; }
+          100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        @keyframes sparkle {
+          0%, 100% { 
+            transform: scale(0) rotate(0deg);
+            opacity: 0;
+          }
+          50% { 
+            transform: scale(1) rotate(180deg);
+            opacity: 1;
+          }
+        }
+        .animate-fire-glow {
+          animation: fireGlow 2s ease-in-out infinite;
+        }
+        .animate-celebration {
+          animation: celebration 1s ease-in-out;
+        }
+        .animate-confetti {
+          animation: confetti 3s linear forwards;
+        }
+        .animate-bounce-in {
+          animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .animate-sparkle {
+          animation: sparkle 1.5s ease-in-out infinite;
+        }
+        .animate-float {
+          animation: float 8s ease-in-out infinite;
+        }
+        .animate-float-delayed {
+          animation: float-delayed 10s ease-in-out infinite;
+        }
+        .animate-pulse-slow {
+          animation: pulse-slow 6s ease-in-out infinite;
+        }
+        .animate-slide-up {
+          animation: slideInUp 0.6s ease-out forwards;
+        }
+        .animate-slide-left {
+          animation: slideInLeft 0.6s ease-out forwards;
+        }
+        .animate-slide-right {
+          animation: slideInRight 0.6s ease-out forwards;
+        }
+        .animate-scale-in {
+          animation: scaleIn 0.5s ease-out forwards;
+        }
+        .animate-shimmer {
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+          background-size: 200px 100%;
+          animation: shimmer 2s infinite;
+        }
+        .glass-morphism {
+          background: rgba(255, 255, 255, 0.25);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .glass-card {
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+      `}</style>
     </div>
   );
 };
@@ -231,8 +369,7 @@ const Header = ({ title, userProfile, setUserProfile }) => {
   const canEditAvatar = userProfile && setUserProfile;
   
   return (
-    <>
-      <header className="flex items-center justify-between p-4 bg-white shadow-sm rounded-xl mb-6">
+    <>      <header className="flex items-center justify-between p-4 glass-card shadow-lg hover:shadow-xl rounded-xl mb-6 transition-all duration-300 animate-slide-up">
         <h1 className="text-2xl font-bold text-green-700">{title}</h1>
         <div className="flex items-center space-x-3">
           <span className="text-lg font-medium hidden sm:block">Welcome, {profile.name}!</span>
@@ -350,8 +487,8 @@ const Dashboard = ({
   setNotification,
   userProfile,
   setUserProfile
-}) => {
-  const [showEcoTipDetails, setShowEcoTipDetails] = useState(null);
+}) => {  const [showEcoTipDetails, setShowEcoTipDetails] = useState(null);
+  const [celebrationEffect, setCelebrationEffect] = useState(null);
   
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([
@@ -402,22 +539,45 @@ const Dashboard = ({
     const habit = habits.find(h => h.id === habitId);
     
     if (habitCompletions.has(habitId)) {
-      newCompletions.delete(habitId);      setNotification(`${habit.name} unmarked. Keep going!`);
+      newCompletions.delete(habitId);
+      setNotification(`${habit.name} unmarked. Keep going!`);
       
       setUserStats(prev => ({
         ...prev,
         totalHabitsCompleted: Math.max(0, prev.totalHabitsCompleted - 1),
         waterSaved: Math.max(0, prev.waterSaved - getHabitImpact(habit.name).water),
         co2Reduced: Math.max(0, prev.co2Reduced - getHabitImpact(habit.name).co2)
-      }));    } else {
+      }));
+    } else {
       newCompletions.add(habitId);
       const allHabitsWillBeCompleted = newCompletions.size === habits.length;
       
+      // Trigger celebration effect
+      setCelebrationEffect({
+        type: allHabitsWillBeCompleted ? 'complete' : 'single',
+        habitName: habit.name,
+        habitColor: habit.color,
+        timestamp: Date.now()
+      });
+      
+      // Clear celebration after animation
+      setTimeout(() => setCelebrationEffect(null), 3000);
+      
       if (allHabitsWillBeCompleted) {
-        setNotification(`🎉 Amazing! All habits completed for today! Streak building! 🌟`);      } else {
+        // Check for streak milestones
+        const currentStreak = userStats.currentStreak;
+        if (currentStreak >= 7 && currentStreak % 7 === 0) {
+          setNotification(`🔥🔥🔥 INCREDIBLE! ${currentStreak + 1} DAY STREAK! You're on fire! 🔥🔥🔥`);
+        } else if (currentStreak >= 3) {
+          setNotification(`🔥 Amazing! All habits completed! ${currentStreak + 1} day streak! 🔥🌟`);
+        } else {
+          setNotification(`🎉 Amazing! All habits completed for today! Streak building! 🌟`);
+        }
+      } else {
         setNotification(`Great job! ${habit.name} completed! 🌱`);
       }
-        const impact = getHabitImpact(habit.name);
+      
+      const impact = getHabitImpact(habit.name);
       const newCompletionCount = newCompletions.size;
       const allHabitsCompleted = newCompletionCount === habits.length;
       
@@ -426,7 +586,8 @@ const Dashboard = ({
           ...prev,
           totalHabitsCompleted: prev.totalHabitsCompleted + 1,
           waterSaved: prev.waterSaved + impact.water,
-          co2Reduced: prev.co2Reduced + impact.co2        };
+          co2Reduced: prev.co2Reduced + impact.co2
+        };
         
         if (allHabitsCompleted && prev.currentStreak === newCompletionCount - 1) {
           newStats.currentStreak = prev.currentStreak + 1;
@@ -437,7 +598,8 @@ const Dashboard = ({
         
         return newStats;
       });
-    }    
+    }
+    
     setHabitCompletions(newCompletions);
     
     setTimeout(() => setNotification(null), 3000);
@@ -574,16 +736,125 @@ Want the full details? Check out the Eco Tips section on your dashboard!`;
 
     return contextualDefaults[Math.floor(Math.random() * contextualDefaults.length)];
   };  return (
-    <div className="space-y-6 pb-20 lg:pb-4 relative">
+    <div className="space-y-6 pb-20 lg:pb-4 relative animate-slide-up">
       <Header title="Dashboard" userProfile={userProfile} setUserProfile={setUserProfile} />
 
-      {notification && (
-        <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-pulse">
-          {notification}        </div>
-      )}      <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-        <h2 className="text-3xl font-bold text-green-800 mb-2">Welcome, {userProfile.name}!</h2>
-        <p className="text-gray-600 text-lg">Your actions make a difference. Let's track your positive impact!</p>
-        
+      {/* Celebration Effect */}
+      {celebrationEffect && (
+        <div className="fixed inset-0 pointer-events-none z-40 overflow-hidden">
+          {/* Confetti */}
+          {Array.from({ length: celebrationEffect.type === 'complete' ? 50 : 25 }, (_, i) => {
+            const colors = ['bg-yellow-400', 'bg-green-400', 'bg-blue-400', 'bg-purple-400', 'bg-pink-400', 'bg-red-400', 'bg-orange-400', 'bg-teal-400'];
+            const left = Math.random() * 100;
+            const delay = Math.random() * 2;
+            const duration = 2 + Math.random() * 2;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            return (
+              <div
+                key={i}
+                className={`absolute w-3 h-3 ${color} animate-confetti pointer-events-none`}
+                style={{
+                  left: `${left}%`,
+                  top: '-10px',
+                  animationDelay: `${delay}s`,
+                  animationDuration: `${duration}s`,
+                  transform: `rotate(${Math.random() * 360}deg)`
+                }}
+              />
+            );
+          })}
+          
+          {/* Sparkles */}
+          {Array.from({ length: celebrationEffect.type === 'complete' ? 20 : 10 }, (_, i) => {
+            const left = Math.random() * 100;
+            const top = Math.random() * 100;
+            const delay = Math.random() * 1.5;
+            
+            return (
+              <div
+                key={i}
+                className="absolute text-yellow-400 animate-sparkle pointer-events-none"
+                style={{
+                  left: `${left}%`,
+                  top: `${top}%`,
+                  animationDelay: `${delay}s`,
+                  fontSize: '20px'
+                }}
+              >
+                ✨
+              </div>
+            );
+          })}
+          
+          {/* Center celebration message */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="animate-bounce-in text-center">
+              {celebrationEffect.type === 'complete' ? (
+                <div className="text-6xl mb-4">
+                  🎉🌟🎊
+                </div>
+              ) : (
+                <div className="text-4xl mb-2 animate-celebration">
+                  {celebrationEffect.habitName.includes('Water') ? '💧' : 
+                   celebrationEffect.habitName.includes('Plastic') ? '♻️' :
+                   celebrationEffect.habitName.includes('Transport') ? '🚌' :
+                   celebrationEffect.habitName.includes('Compost') ? '🌱' :
+                   celebrationEffect.habitName.includes('Meat') ? '🥗' :
+                   celebrationEffect.habitName.includes('Unplug') ? '💡' : '✅'}
+                </div>
+              )}
+              
+              <div className={`glass-morphism text-white px-6 py-3 rounded-xl shadow-xl animate-bounce-in ${
+                celebrationEffect.type === 'complete' ? 'text-2xl font-bold' : 'text-lg font-semibold'
+              }`}>
+                {celebrationEffect.type === 'complete' ? 
+                  '🎊 ALL HABITS COMPLETED! 🎊' : 
+                  `🌟 ${celebrationEffect.habitName} Completed! 🌟`
+                }
+              </div>
+            </div>
+          </div>
+          
+          {/* Floating celebration emojis for complete */}
+          {celebrationEffect.type === 'complete' && (
+            <>
+              <div className="absolute top-1/4 left-1/4 text-4xl animate-float">🎉</div>
+              <div className="absolute top-1/3 right-1/4 text-4xl animate-float-delayed">🌟</div>
+              <div className="absolute bottom-1/4 left-1/3 text-4xl animate-pulse-slow">🎊</div>
+              <div className="absolute bottom-1/3 right-1/3 text-4xl animate-float">🏆</div>
+            </>
+          )}
+        </div>
+      )}      {notification && (
+        <div className="fixed top-4 right-4 glass-morphism text-white px-6 py-3 rounded-xl shadow-xl z-50 animate-scale-in backdrop-blur-lg">
+          <div className="flex items-center space-x-2">
+            <div className="animate-bounce">
+              {notification.includes('🔥') ? '🔥' : 
+               notification.includes('🎉') ? '🎉' :
+               notification.includes('🌟') ? '🌟' : '🌱'}
+            </div>
+            <span>{notification}</span>
+            <div className="animate-pulse">
+              {notification.includes('STREAK') ? '🔥' : 
+               notification.includes('Perfect') ? '⭐' : '✨'}
+            </div>
+          </div>
+        </div>
+      )}<div className="glass-card p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 text-center animate-slide-left transform hover:scale-105">        <h2 className="text-3xl font-bold text-green-800 mb-2">Welcome, {userProfile.name}!</h2>
+        <p className="text-gray-600 text-lg">Your actions make a difference. Let's track your positive impact!</p>        {userStats.currentStreak > 0 && (
+          <div className="mt-4 mb-4 inline-flex items-center justify-center bg-gradient-to-r from-orange-100 to-red-100 text-orange-800 px-6 py-3 rounded-full transform hover:scale-105 transition-all duration-300 relative overflow-hidden">
+            <span className="text-2xl mr-2 animate-fire-glow">🔥</span>
+            <span className="font-bold text-lg">{userStats.currentStreak} Day Streak!</span>
+            <span className="text-2xl ml-2 animate-fire-glow">🔥</span>
+            
+            {/* Floating sparkles around streak */}
+            <div className="absolute -top-1 left-1/4 animate-sparkle text-yellow-400">✨</div>
+            <div className="absolute -top-1 right-1/4 animate-sparkle text-yellow-400" style={{ animationDelay: '0.5s' }}>✨</div>
+            <div className="absolute -bottom-1 left-1/3 animate-sparkle text-yellow-400" style={{ animationDelay: '1s' }}>✨</div>
+            <div className="absolute -bottom-1 right-1/3 animate-sparkle text-yellow-400" style={{ animationDelay: '1.5s' }}>✨</div>
+          </div>
+        )}
         {habitCompletions.size === 0 && (
           <div className="mt-4 inline-flex items-center bg-blue-100 text-blue-800 px-4 py-2 rounded-full">
             <Target className="w-5 h-5 mr-2" />
@@ -608,9 +879,7 @@ Want the full details? Check out the Eco Tips section on your dashboard!`;
           <div className="mt-4 text-sm text-gray-600">
             <p>Your impact so far: <span className="font-semibold text-green-600">{userStats.waterSaved}L water saved</span> & <span className="font-semibold text-green-600">{userStats.co2Reduced.toFixed(1)}kg CO2 reduced</span></p>
           </div>
-        )}      </div>
-
-      <section className="bg-white p-6 rounded-xl shadow-sm">
+        )}      </div>      <section className="glass-card p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 animate-slide-right transform hover:scale-105">
         <h2 className="text-2xl font-bold text-green-700 mb-4">Track Daily Habits</h2>        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {habits.map((habit) => (
             <HabitCard 
@@ -621,22 +890,23 @@ Want the full details? Check out the Eco Tips section on your dashboard!`;
             />          ))}
         </div>        <button 
           onClick={() => setCurrentPage('habits')}
-          className="mt-6 w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200"
+          className="mt-6 w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
         >
           Add Custom Habit
         </button>
-      </section>      <section className="bg-white p-6 rounded-xl shadow-sm">
+      </section>      <section className="glass-card p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 animate-slide-left transform hover:scale-105">
         <h2 className="text-2xl font-bold text-green-700 mb-4">Your Progress Dashboard</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <ProgressChart 
             title="Habit Completion Rate" 
             value={`${Math.round((habitCompletions.size / habits.length) * 100)}%`} 
             description={`${habitCompletions.size} of ${habits.length} habits completed today`} 
-          />
-          <ProgressChart 
+          />          <ProgressChart 
             title="Current Streak" 
             value={userStats.currentStreak === 0 ? "Start Today!" : `${userStats.currentStreak} Days`} 
             description={userStats.longestStreak > 0 ? `Longest streak: ${userStats.longestStreak} Days` : "Complete all daily habits to build your streak!"} 
+            isStreak={true}
+            streakCount={userStats.currentStreak}
           />
           <ProgressChart 
             title="Water Saved" 
@@ -666,9 +936,7 @@ Want the full details? Check out the Eco Tips section on your dashboard!`;
             </div>
             <div className="text-sm text-gray-600">Today's Status</div>
           </div>        </div>
-      </section>
-
-      <section className="bg-white p-6 rounded-xl shadow-sm">
+      </section>      <section className="glass-card p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 animate-slide-right transform hover:scale-105">
         <h2 className="text-2xl font-bold text-green-700 mb-4">Eco Tips for You</h2>        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {ecoTips.map((tip) => (
             <EcoTipCard 
@@ -679,24 +947,22 @@ Want the full details? Check out the Eco Tips section on your dashboard!`;
             />          ))}
         </div>        <button 
           onClick={() => setCurrentPage('ecoTips')}
-          className="mt-6 w-full bg-emerald-500 text-white py-3 rounded-lg font-semibold hover:bg-emerald-600 transition-colors duration-200"
+          className="mt-6 w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-3 rounded-lg font-semibold hover:from-emerald-600 hover:to-teal-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
         >
           Explore More Tips
         </button>
       </section>      {!isChatOpen && (
         <button
           onClick={() => setIsChatOpen(true)}
-          className="fixed bottom-6 right-6 w-16 h-16 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 z-50"
+          className="fixed bottom-6 right-6 w-16 h-16 glass-morphism hover:bg-green-700/20 text-green-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 z-50 animate-float"
           aria-label="Open chatbot"
         >
           <Bot className="w-8 h-8" />        </button>
-      )}
-
-      {isChatOpen && (
-        <div className="fixed bottom-6 right-6 w-96 max-w-[calc(100vw-2rem)] h-[500px] bg-white rounded-xl shadow-2xl flex flex-col z-50 border border-gray-200">
-          <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-green-600 text-white rounded-t-xl">
+      )}      {isChatOpen && (
+        <div className="fixed bottom-6 right-6 w-96 max-w-[calc(100vw-2rem)] h-[500px] glass-card rounded-xl shadow-2xl flex flex-col z-50 border border-white/30 animate-scale-in">
+          <div className="flex justify-between items-center p-4 border-b border-white/20 bg-gradient-to-r from-green-600/90 to-emerald-600/90 text-white rounded-t-xl backdrop-blur-sm">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-green-500/80 rounded-full flex items-center justify-center backdrop-blur-sm">
                 <Bot className="w-6 h-6" />
               </div>
               <div>
@@ -706,20 +972,20 @@ Want the full details? Check out the Eco Tips section on your dashboard!`;
             </div>
             <button 
               onClick={() => setIsChatOpen(false)} 
-              className="text-green-100 hover:text-white transition-colors"
+              className="text-green-100 hover:text-white transition-all duration-300 hover:scale-110"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>            </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 backdrop-blur-sm">
             {chatMessages.map((msg) => (
-              <div key={msg.id} className={`flex ${msg.sender === 'bot' ? 'justify-start' : 'justify-end'}`}>
-                <div className={`max-w-[80%] p-3 rounded-lg ${
+              <div key={msg.id} className={`flex ${msg.sender === 'bot' ? 'justify-start' : 'justify-end'} animate-slide-up`}>
+                <div className={`max-w-[80%] p-3 rounded-lg transition-all duration-300 hover:shadow-lg ${
                   msg.sender === 'bot' 
-                    ? 'bg-gray-100 text-gray-800 rounded-bl-none' 
-                    : 'bg-green-600 text-white rounded-br-none'
+                    ? 'bg-white/80 text-gray-800 rounded-bl-none backdrop-blur-sm border border-white/20' 
+                    : 'bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-br-none shadow-lg'
                 }`}>
                   <p className="text-sm">{msg.text}</p>
                   <p className="text-xs mt-1 opacity-70">{msg.timestamp}</p>
@@ -727,8 +993,8 @@ Want the full details? Check out the Eco Tips section on your dashboard!`;
               </div>
             ))}
             {isTyping && (
-              <div className="flex justify-start">
-                <div className="bg-gray-100 text-gray-800 p-3 rounded-lg rounded-bl-none">
+              <div className="flex justify-start animate-slide-up">
+                <div className="bg-white/80 text-gray-800 p-3 rounded-lg rounded-bl-none backdrop-blur-sm border border-white/20">
                   <div className="flex space-x-1">
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                     <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
@@ -736,23 +1002,23 @@ Want the full details? Check out the Eco Tips section on your dashboard!`;
                   </div>
                 </div>              </div>
             )}
-          </div>          <div className="p-4 border-t border-gray-200">
+          </div>          <div className="p-4 border-t border-white/20 backdrop-blur-sm">
             <div className="flex flex-wrap gap-2 mb-3">
               <button 
                 onClick={() => setChatInput("How am I doing with my progress?")}
-                className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs hover:bg-green-200 transition-colors"
+                className="px-3 py-1 bg-green-100/80 text-green-700 rounded-full text-xs hover:bg-green-200/80 transition-all duration-300 hover:scale-105 backdrop-blur-sm"
               >
                 📊 My Progress
               </button>
               <button 
                 onClick={() => setChatInput("Give me an eco tip")}
-                className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs hover:bg-blue-200 transition-colors"
+                className="px-3 py-1 bg-blue-100/80 text-blue-700 rounded-full text-xs hover:bg-blue-200/80 transition-all duration-300 hover:scale-105 backdrop-blur-sm"
               >
                 💡 Get Tip
               </button>
               <button 
                 onClick={() => setChatInput("I need motivation")}
-                className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs hover:bg-purple-200 transition-colors"
+                className="px-3 py-1 bg-purple-100/80 text-purple-700 rounded-full text-xs hover:bg-purple-200/80 transition-all duration-300 hover:scale-105 backdrop-blur-sm"
               >
                 🔥 Motivate Me
               </button>
@@ -764,13 +1030,13 @@ Want the full details? Check out the Eco Tips section on your dashboard!`;
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                className="flex-1 p-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="flex-1 p-3 border border-white/30 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-transparent backdrop-blur-sm bg-white/50"
                 placeholder="Ask me about eco-friendly tips..."
               />
               <button 
                 onClick={handleSendMessage}
                 disabled={!chatInput.trim()}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg text-sm font-semibold hover:bg-green-700 transition-colors duration-200 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg text-sm font-semibold hover:from-green-700 hover:to-emerald-700 transition-all duration-300 disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg hover:shadow-xl hover:scale-105"
               >
                 Send
               </button>
@@ -783,33 +1049,59 @@ Want the full details? Check out the Eco Tips section on your dashboard!`;
 };
 
 const HabitCard = ({ habit, isCompleted, onLogHabit }) => (
-  <div className={`p-4 rounded-lg flex flex-col items-center text-center shadow-sm hover:shadow-md transition-all duration-200 ${
-    isCompleted ? 'bg-green-100 ring-2 ring-green-300' : 'bg-green-50'
+  <div className={`p-4 rounded-lg flex flex-col items-center text-center shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 glass-card animate-scale-in relative overflow-hidden ${
+    isCompleted ? 'ring-2 ring-green-300 animate-shimmer' : 'hover:ring-2 hover:ring-green-200'
   }`}>
-    <div className={`p-3 rounded-full bg-${habit.color}-200 text-${habit.color}-700 mb-3 ${
-      isCompleted ? 'ring-2 ring-green-400' : ''
+    {/* Celebration overlay for completed habits */}
+    {isCompleted && (
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1 right-1 animate-sparkle">✨</div>
+        <div className="absolute top-1 left-1 animate-sparkle" style={{ animationDelay: '0.5s' }}>✨</div>
+        <div className="absolute bottom-1 right-1 animate-sparkle" style={{ animationDelay: '1s' }}>✨</div>
+        <div className="absolute bottom-1 left-1 animate-sparkle" style={{ animationDelay: '1.5s' }}>✨</div>
+      </div>
+    )}
+    
+    <div className={`p-3 rounded-full bg-${habit.color}-200 text-${habit.color}-700 mb-3 transition-all duration-300 relative ${
+      isCompleted ? 'ring-2 ring-green-400 animate-pulse' : 'hover:scale-110'
     }`}>
       <habit.icon className="w-8 h-8" />
+      {isCompleted && (
+        <div className="absolute -top-1 -right-1 text-green-500 animate-bounce-in">
+          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+            <span className="text-white text-xs">✓</span>
+          </div>
+        </div>
+      )}
     </div>
+    
     <h3 className="text-lg font-semibold text-gray-800 mb-2">{habit.name}</h3>
+    
     {isCompleted && (
-      <div className="flex items-center text-green-600 mb-2">
+      <div className="flex items-center text-green-600 mb-2 animate-slide-up">
         <CheckCircle className="w-5 h-5 mr-1" />
         <span className="text-sm font-medium">Completed!</span>
+        <span className="ml-1 animate-celebration">🎉</span>
       </div>
-    )}    <button 
+    )}
+    
+    <button 
       onClick={() => onLogHabit(habit.id)}
-      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 shadow-md ${
+      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 relative overflow-hidden ${
         isCompleted
           ? 'bg-green-600 text-white hover:bg-green-700'
           : 'bg-green-500 text-white hover:bg-green-600'
-      }`}    >
+      }`}
+    >
       {isCompleted ? 'Logged ✓' : 'Log Habit'}
+      {!isCompleted && (
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full hover:translate-x-full transition-transform duration-700"></div>
+      )}
     </button>
   </div>
 );
 
-const ProgressChart = ({ title, value, description }) => {
+const ProgressChart = ({ title, value, description, isStreak = false, streakCount = 0 }) => {
   const getProgressWidth = () => {
     if (title === "Habit Completion Rate") {
       return value; // Already in percentage format
@@ -827,13 +1119,83 @@ const ProgressChart = ({ title, value, description }) => {
     }
   };
 
+  const renderStreakFires = () => {
+    if (!isStreak || streakCount === 0) return null;
+    
+    const fireCount = Math.min(streakCount, 10); // Max 10 fire emojis for display
+    const fires = [];
+    
+    for (let i = 0; i < fireCount; i++) {
+      fires.push(
+        <span 
+          key={i} 
+          className="text-2xl animate-pulse inline-block transform hover:scale-125 transition-transform duration-300"
+          style={{ 
+            animationDelay: `${i * 0.1}s`,
+            filter: 'drop-shadow(0 0 8px rgba(255, 69, 0, 0.6))'
+          }}
+        >
+          🔥
+        </span>
+      );
+    }
+    
+    return (
+      <div className="flex flex-wrap justify-center gap-1 mt-2 mb-2">
+        {fires}
+        {streakCount > 10 && (
+          <span className="text-sm text-orange-600 font-bold ml-2">+{streakCount - 10}</span>
+        )}
+      </div>
+    );
+  };
   return (
-    <div className="bg-green-50 p-5 rounded-lg shadow-sm flex flex-col items-center justify-center text-center">      <h3 className="text-xl font-semibold text-green-700 mb-2">{title}</h3>
-      <div className="text-4xl font-bold text-green-800 mb-2">{value}</div>
+    <div className="glass-card p-5 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-center justify-center text-center transform hover:scale-105 animate-scale-in relative overflow-hidden">
+      {/* Celebration sparkles for high progress */}
+      {((title === "Habit Completion Rate" && parseInt(value) === 100) || 
+        (isStreak && streakCount > 0)) && (
+        <>
+          <div className="absolute top-2 right-2 animate-sparkle text-yellow-400">✨</div>
+          <div className="absolute top-2 left-2 animate-sparkle text-yellow-400" style={{ animationDelay: '0.5s' }}>✨</div>
+          <div className="absolute bottom-2 right-2 animate-sparkle text-yellow-400" style={{ animationDelay: '1s' }}>✨</div>
+          <div className="absolute bottom-2 left-2 animate-sparkle text-yellow-400" style={{ animationDelay: '1.5s' }}>✨</div>
+        </>
+      )}
+      
+      <h3 className="text-xl font-semibold text-green-700 mb-2">{title}</h3>
+      
+      {isStreak && streakCount > 0 && (
+        <div className="mb-2">
+          <span className="text-6xl animate-bounce inline-block" style={{ filter: 'drop-shadow(0 0 12px rgba(255, 69, 0, 0.8))' }}>
+            🔥
+          </span>
+        </div>
+      )}
+      
+      <div className={`text-4xl font-bold mb-2 flex items-center gap-2 ${
+        (title === "Habit Completion Rate" && parseInt(value) === 100) ? 'text-green-800 animate-celebration' : 'text-green-800'
+      }`}>
+        {value}
+        {isStreak && streakCount > 0 && (
+          <span className="text-2xl animate-fire-glow">🔥</span>
+        )}
+        {title === "Habit Completion Rate" && parseInt(value) === 100 && (
+          <span className="text-2xl animate-bounce">🎉</span>
+        )}
+      </div>
+      
+      {renderStreakFires()}
+      
       <p className="text-gray-600 text-sm mb-4">{description}</p>
-      <div className="w-full h-4 bg-green-200 rounded-full overflow-hidden">
+      <div className="w-full h-4 bg-green-200/50 rounded-full overflow-hidden backdrop-blur-sm">
         <div 
-          className="h-full bg-green-500 rounded-full transition-all duration-500 ease-in-out" 
+          className={`h-full rounded-full transition-all duration-700 ease-in-out shadow-sm ${
+            isStreak && streakCount > 0 
+              ? 'bg-gradient-to-r from-orange-400 via-red-500 to-orange-600' 
+              : parseInt(value) === 100 
+                ? 'bg-gradient-to-r from-yellow-400 via-green-500 to-green-600 animate-shimmer'
+                : 'bg-gradient-to-r from-green-400 to-green-600'
+          }`}
           style={{ width: getProgressWidth() }}
         ></div>
       </div>
@@ -842,9 +1204,9 @@ const ProgressChart = ({ title, value, description }) => {
 };
 
 const EcoTipCard = ({ tip, isExpanded, onReadMore }) => (
-  <div className="bg-white border border-green-200 p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 flex flex-col">
+  <div className="glass-card border border-green-200/50 p-5 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col transform hover:scale-105 animate-slide-up">
     <div className="flex items-center mb-3">
-      <div className={`p-2 rounded-full bg-${tip.color}-100 text-${tip.color}-600 mr-3`}>
+      <div className={`p-2 rounded-full bg-${tip.color}-100 text-${tip.color}-600 mr-3 transition-transform duration-300 hover:scale-110`}>
         <tip.icon className="w-6 h-6" />
       </div>
       <h3 className="text-lg font-semibold text-gray-800">{tip.title}</h3>
@@ -854,7 +1216,7 @@ const EcoTipCard = ({ tip, isExpanded, onReadMore }) => (
     </p>
     <button 
       onClick={() => onReadMore(tip.id)}
-      className="text-green-600 hover:text-green-800 font-medium text-sm self-end transition-colors duration-200"
+      className="text-green-600 hover:text-green-800 font-medium text-sm self-end transition-all duration-300 hover:scale-105"
     >
       {isExpanded ? 'Show Less ↑' : 'Read More →'}
     </button>
