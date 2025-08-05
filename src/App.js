@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Leaf, Target, Award, BookOpen, User, Info, CheckCircle, Droplet, Recycle, Lightbulb, Flower2, CalendarDays, Bell, Camera, Search, TrendingUp, Users, ShoppingBag, FileText, Bot, Globe, Settings, Sun, Wind, Cloud } from 'lucide-react';
+import { Home, Leaf, Target, Award, User, Info, CheckCircle, Droplet, Recycle, Lightbulb, Flower2, TrendingUp, Users, ShoppingBag, FileText, Bot, Globe, Settings, Wind, Edit3, X } from 'lucide-react';
 const App = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
   
@@ -13,9 +13,14 @@ const App = () => {
     joinDate: new Date().toISOString().split('T')[0] 
   });
   const [notification, setNotification] = useState(null);
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'dashboard':
+  
+  const [userProfile, setUserProfile] = useState({
+    name: 'EcoWarrior',
+    initials: 'EW',
+    avatarColor: 'bg-green-300',
+    avatarIcon: null
+  });  const renderPage = () => {
+    switch (currentPage) {      case 'dashboard':
         return <Dashboard 
           setCurrentPage={setCurrentPage}
           habitCompletions={habitCompletions}
@@ -24,6 +29,8 @@ const App = () => {
           setUserStats={setUserStats}
           notification={notification}
           setNotification={setNotification}
+          userProfile={userProfile}
+          setUserProfile={setUserProfile}
         />;
       case 'habits':
         return <HabitsPage 
@@ -31,24 +38,25 @@ const App = () => {
           setHabitCompletions={setHabitCompletions}
           userStats={userStats}
           setUserStats={setUserStats}
+          userProfile={userProfile}
+          setUserProfile={setUserProfile}
         />;
       case 'goals':
-        return <GoalsPage />;
+        return <GoalsPage userProfile={userProfile} setUserProfile={setUserProfile} />;
       case 'ecoTips':
-        return <EcoTipsPage />;
+        return <EcoTipsPage userProfile={userProfile} setUserProfile={setUserProfile} />;
       case 'achievements':
-        return <AchievementsPage />;
+        return <AchievementsPage userProfile={userProfile} setUserProfile={setUserProfile} />;
       case 'profile':
-        return <ProfilePage userStats={userStats} />;
+        return <ProfilePage userStats={userStats} userProfile={userProfile} setUserProfile={setUserProfile} />;
       case 'about':
-        return <AboutPage />;
+        return <AboutPage userProfile={userProfile} setUserProfile={setUserProfile} />;
       case 'marketplace':
-        return <MarketplacePage />;
+        return <MarketplacePage userProfile={userProfile} setUserProfile={setUserProfile} />;
       case 'summary':
-        return <SummaryPage userStats={userStats} habitCompletions={habitCompletions} />;
+        return <SummaryPage userStats={userStats} habitCompletions={habitCompletions} userProfile={userProfile} setUserProfile={setUserProfile} />;
       case 'community':
-        return <CommunityPage />;
-      default:
+        return <CommunityPage userProfile={userProfile} setUserProfile={setUserProfile} />;      default:
         return <Dashboard 
           setCurrentPage={setCurrentPage}
           habitCompletions={habitCompletions}
@@ -57,6 +65,8 @@ const App = () => {
           setUserStats={setUserStats}
           notification={notification}
           setNotification={setNotification}
+          userProfile={userProfile}
+          setUserProfile={setUserProfile}
         />;
     }
   };
@@ -72,17 +82,190 @@ const App = () => {
   );
 };
 
-const Header = ({ title }) => (
-  <header className="flex items-center justify-between p-4 bg-white shadow-sm rounded-xl mb-6">
-    <h1 className="text-2xl font-bold text-green-700">{title}</h1>
-    <div className="flex items-center space-x-3">
-      <span className="text-lg font-medium hidden sm:block">Welcome, EcoWarrior!</span>
-      <div className="w-10 h-10 bg-green-300 rounded-full flex items-center justify-center text-white font-bold text-xl ring-2 ring-green-500">
-        EW
+const AvatarCreationModal = ({ userProfile, setUserProfile, onClose }) => {
+  const [tempProfile, setTempProfile] = useState({...userProfile});
+
+  const avatarColors = [
+    'bg-green-300', 'bg-blue-300', 'bg-purple-300', 'bg-pink-300',
+    'bg-yellow-300', 'bg-red-300', 'bg-indigo-300', 'bg-orange-300',
+    'bg-teal-300', 'bg-cyan-300', 'bg-emerald-300', 'bg-lime-300'
+  ];
+
+  const avatarIcons = [
+    { icon: User, name: 'User' },
+    { icon: Leaf, name: 'Leaf' },
+    { icon: Recycle, name: 'Recycle' },
+    { icon: Globe, name: 'Globe' },
+    { icon: Wind, name: 'Wind' },
+    { icon: Droplet, name: 'Droplet' },
+    { icon: Settings, name: 'Settings' },
+    { icon: Target, name: 'Target' },
+    null
+  ];
+
+  const handleSave = () => {
+    setUserProfile(tempProfile);
+    onClose();
+  };
+
+  const handleNameChange = (newName) => {
+    const initials = newName.split(' ').map(word => word.charAt(0).toUpperCase()).join('').slice(0, 2) || 'U';
+    setTempProfile({
+      ...tempProfile,
+      name: newName,
+      initials: initials
+    });
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">Create Your Avatar</h2>
+            <button
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="text-center mb-6">
+            <div className={`w-24 h-24 ${tempProfile.avatarColor} rounded-full flex items-center justify-center text-white font-bold text-3xl ring-4 ring-green-500 mx-auto mb-4`}>
+              {tempProfile.avatarIcon ? (
+                <tempProfile.avatarIcon className="w-12 h-12" />
+              ) : (
+                tempProfile.initials
+              )}
+            </div>
+            <p className="text-gray-600">Welcome, {tempProfile.name}!</p>
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+            <input
+              type="text"
+              value={tempProfile.name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Enter your name"
+            />
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-3">Avatar Style</label>
+            <div className="grid grid-cols-3 gap-3">
+              {avatarIcons.map((iconData, index) => (
+                <button
+                  key={index}
+                  onClick={() => setTempProfile({...tempProfile, avatarIcon: iconData?.icon || null})}
+                  className={`p-3 rounded-lg border-2 transition-all duration-200 ${
+                    (iconData?.icon === tempProfile.avatarIcon) || (iconData === null && tempProfile.avatarIcon === null)
+                      ? 'border-green-500 bg-green-50' 
+                      : 'border-gray-200 hover:border-green-300'
+                  }`}
+                >
+                  <div className={`w-8 h-8 ${tempProfile.avatarColor} rounded-full flex items-center justify-center text-white font-bold mx-auto`}>
+                    {iconData?.icon ? (
+                      <iconData.icon className="w-4 h-4" />
+                    ) : (
+                      tempProfile.initials
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1">{iconData?.name || 'Initials'}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-3">Avatar Color</label>
+            <div className="grid grid-cols-6 gap-3">
+              {avatarColors.map((color, index) => (
+                <button
+                  key={index}
+                  onClick={() => setTempProfile({...tempProfile, avatarColor: color})}
+                  className={`w-10 h-10 ${color} rounded-full border-4 transition-all duration-200 ${
+                    color === tempProfile.avatarColor 
+                      ? 'border-gray-800 scale-110' 
+                      : 'border-gray-300 hover:border-gray-500'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex space-x-3">
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors duration-200"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
+            >
+              Save Avatar
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  </header>
-);
+  );
+};
+
+const Header = ({ title, userProfile, setUserProfile }) => {
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  
+  // Provide default values if userProfile is not passed
+  const defaultProfile = {
+    name: 'EcoWarrior',
+    initials: 'EW',
+    avatarColor: 'bg-green-300',
+    avatarIcon: null
+  };
+  
+  const profile = userProfile || defaultProfile;
+  const canEditAvatar = userProfile && setUserProfile;
+  
+  return (
+    <>
+      <header className="flex items-center justify-between p-4 bg-white shadow-sm rounded-xl mb-6">
+        <h1 className="text-2xl font-bold text-green-700">{title}</h1>
+        <div className="flex items-center space-x-3">
+          <span className="text-lg font-medium hidden sm:block">Welcome, {profile.name}!</span>
+          <button
+            onClick={() => canEditAvatar && setIsAvatarModalOpen(true)}
+            className={`relative group ${canEditAvatar ? 'cursor-pointer' : 'cursor-default'}`}
+          >
+            <div className={`w-10 h-10 ${profile.avatarColor} rounded-full flex items-center justify-center text-white font-bold text-xl ring-2 ring-green-500 ${canEditAvatar ? 'hover:ring-green-600 hover:scale-105' : ''} transition-all duration-200`}>
+              {profile.avatarIcon ? (
+                <profile.avatarIcon className="w-6 h-6" />
+              ) : (
+                profile.initials
+              )}
+            </div>
+            {canEditAvatar && (
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <Edit3 className="w-2.5 h-2.5 text-white" />
+              </div>
+            )}
+          </button>
+        </div>
+      </header>
+
+      {isAvatarModalOpen && canEditAvatar && (
+        <AvatarCreationModal
+          userProfile={userProfile}
+          setUserProfile={setUserProfile}
+          onClose={() => setIsAvatarModalOpen(false)}
+        />
+      )}
+    </>
+  );
+};
 
 const Sidebar = ({ setCurrentPage, currentPage }) => {
   const navItems = [
@@ -164,7 +347,9 @@ const Dashboard = ({
   userStats, 
   setUserStats, 
   notification, 
-  setNotification 
+  setNotification,
+  userProfile,
+  setUserProfile
 }) => {
   const [showEcoTipDetails, setShowEcoTipDetails] = useState(null);
   
@@ -388,16 +573,15 @@ Want the full details? Check out the Eco Tips section on your dashboard!`;
     ];
 
     return contextualDefaults[Math.floor(Math.random() * contextualDefaults.length)];
-  };
-  return (
+  };  return (
     <div className="space-y-6 pb-20 lg:pb-4 relative">
-      <Header title="Dashboard" />
+      <Header title="Dashboard" userProfile={userProfile} setUserProfile={setUserProfile} />
 
       {notification && (
         <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-pulse">
           {notification}        </div>
       )}      <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-        <h2 className="text-3xl font-bold text-green-800 mb-2">Welcome, EcoWarrior!</h2>
+        <h2 className="text-3xl font-bold text-green-800 mb-2">Welcome, {userProfile.name}!</h2>
         <p className="text-gray-600 text-lg">Your actions make a difference. Let's track your positive impact!</p>
         
         {habitCompletions.size === 0 && (
@@ -613,15 +797,13 @@ const HabitCard = ({ habit, isCompleted, onLogHabit }) => (
         <CheckCircle className="w-5 h-5 mr-1" />
         <span className="text-sm font-medium">Completed!</span>
       </div>
-    )}
-    <button 
+    )}    <button 
       onClick={() => onLogHabit(habit.id)}
       className={`px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 shadow-md ${
         isCompleted
           ? 'bg-green-600 text-white hover:bg-green-700'
           : 'bg-green-500 text-white hover:bg-green-600'
-      }`}
-    >
+      }`}    >
       {isCompleted ? 'Logged ✓' : 'Log Habit'}
     </button>
   </div>
@@ -630,7 +812,8 @@ const HabitCard = ({ habit, isCompleted, onLogHabit }) => (
 const ProgressChart = ({ title, value, description }) => {
   const getProgressWidth = () => {
     if (title === "Habit Completion Rate") {
-      return value; // Already in percentage format    } else if (title === "Current Streak") {
+      return value; // Already in percentage format
+    } else if (title === "Current Streak") {
       const numericValue = parseInt(value) || 0;
       return numericValue > 0 ? "100%" : "0%";
     } else {
@@ -678,15 +861,7 @@ const EcoTipCard = ({ tip, isExpanded, onReadMore }) => (
   </div>
 );
 
-const PagePlaceholder = ({ title, icon: Icon }) => (
-  <div className="flex flex-col items-center justify-center min-h-[60vh] bg-white p-8 rounded-xl shadow-sm text-center">
-    <Icon className="w-16 h-16 text-green-500 mb-4" />
-    <h2 className="text-3xl font-bold text-green-700 mb-2">{title}</h2>
-    <p className="text-gray-600 text-lg">This is the {title} page. Content coming soon!</p>
-  </div>
-);
-
-const HabitsPage = ({ habitCompletions, setHabitCompletions, userStats, setUserStats }) => {
+const HabitsPage = ({ habitCompletions, setHabitCompletions, userStats, setUserStats, userProfile, setUserProfile }) => {
   const habits = [
     { id: 1, name: 'Reduce Plastic', icon: Recycle, color: 'blue', impact: { water: 5, co2: 2 } },
     { id: 2, name: 'Save Water', icon: Droplet, color: 'sky', impact: { water: 10, co2: 1 } },
@@ -715,9 +890,8 @@ const HabitsPage = ({ habitCompletions, setHabitCompletions, userStats, setUserS
       }));
     }
   };
-
   return (
-    <div className="space-y-6 pb-20 lg:pb-4">      <Header title="Track Daily Habits" />
+    <div className="space-y-6 pb-20 lg:pb-4">      <Header title="Track Daily Habits" userProfile={userProfile} setUserProfile={setUserProfile} />
       
       <div className="bg-white p-6 rounded-xl shadow-sm">
         <h2 className="text-2xl font-bold text-green-700 mb-4">Today's Habits</h2>        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -752,16 +926,15 @@ const HabitsPage = ({ habitCompletions, setHabitCompletions, userStats, setUserS
   );
 };
 
-const GoalsPage = () => {
-  const [goals, setGoals] = useState([
+const GoalsPage = ({ userProfile, setUserProfile }) => {
+  const goals = [
     { id: 1, title: 'Reduce Water Usage', target: 100, current: 65, unit: 'liters saved' },
     { id: 2, title: 'Plastic-Free Week', target: 7, current: 3, unit: 'days completed' },
     { id: 3, title: 'Carbon Footprint', target: 50, current: 32, unit: 'kg CO2 reduced' },
-  ]);
-
+  ];
   return (
     <div className="space-y-6 pb-20 lg:pb-4">
-      <Header title="Environmental Goals" />
+      <Header title="Environmental Goals" userProfile={userProfile} setUserProfile={setUserProfile} />
       
       <div className="bg-white p-6 rounded-xl shadow-sm">
         <h2 className="text-2xl font-bold text-green-700 mb-4">Current Goals</h2>
@@ -792,7 +965,7 @@ const GoalsPage = () => {
   );
 };
 
-const EcoTipsPage = () => {
+const EcoTipsPage = ({ userProfile, setUserProfile }) => {
   const tips = [
     { id: 1, category: 'Water', title: 'Fix Leaky Faucets', description: 'A single drip per second can waste over 3,000 gallons per year.', icon: Droplet },
     { id: 2, category: 'Energy', title: 'LED Light Bulbs', description: 'LED bulbs use 75% less energy than incandescent bulbs.', icon: Lightbulb },
@@ -801,10 +974,9 @@ const EcoTipsPage = () => {
     { id: 5, category: 'Food', title: 'Plant-Based Meals', description: 'One plant-based meal saves 2.5 pounds of CO2 emissions.', icon: Leaf },
     { id: 6, category: 'Home', title: 'Smart Thermostat', description: 'Can reduce heating and cooling costs by up to 23%.', icon: Settings },
   ];
-
   return (
     <div className="space-y-6 pb-20 lg:pb-4">
-      <Header title="Eco Tips Library" />
+      <Header title="Eco Tips Library" userProfile={userProfile} setUserProfile={setUserProfile} />
       
       <div className="bg-white p-6 rounded-xl shadow-sm">
         <h2 className="text-2xl font-bold text-green-700 mb-4">Environmental Tips</h2>
@@ -827,7 +999,7 @@ const EcoTipsPage = () => {
   );
 };
 
-const AchievementsPage = () => {
+const AchievementsPage = ({ userProfile, setUserProfile }) => {
   const achievements = [
     { id: 1, title: 'Water Warrior', description: 'Saved 500+ liters of water', icon: Droplet, unlocked: true },
     { id: 2, title: 'Plastic Fighter', description: 'Avoided plastic for 7 days', icon: Recycle, unlocked: true },
@@ -836,10 +1008,9 @@ const AchievementsPage = () => {
     { id: 5, title: 'Eco Master', description: 'Complete all habits for 30 days', icon: Award, unlocked: false },
     { id: 6, title: 'Plant Parent', description: 'Started composting', icon: Flower2, unlocked: false },
   ];
-
   return (
     <div className="space-y-6 pb-20 lg:pb-4">
-      <Header title="Achievements" />
+      <Header title="Achievements" userProfile={userProfile} setUserProfile={setUserProfile} />
       
       <div className="bg-white p-6 rounded-xl shadow-sm">
         <h2 className="text-2xl font-bold text-green-700 mb-4">Your Badges</h2>
@@ -874,18 +1045,17 @@ const AchievementsPage = () => {
   );
 };
 
-const ProfilePage = ({ userStats }) => {
-  const [profile, setProfile] = useState({
+const ProfilePage = ({ userStats, userProfile, setUserProfile }) => {
+  const profile = {
     name: 'EcoWarrior',
     email: 'eco@warrior.com',
     joinDate: userStats?.joinDate || '2025-01-01',
     totalPoints: 1250,
     level: 'Green Champion'
-  });
-
+  };
   return (
     <div className="space-y-6 pb-20 lg:pb-4">
-      <Header title="Profile" />
+      <Header title="Profile" userProfile={userProfile} setUserProfile={setUserProfile} />
       
       <div className="bg-white p-6 rounded-xl shadow-sm">
         <div className="flex items-center mb-6">
@@ -939,9 +1109,9 @@ const ProfilePage = ({ userStats }) => {
   );
 };
 
-const AboutPage = () => (
+const AboutPage = ({ userProfile, setUserProfile }) => (
   <div className="space-y-6 pb-20 lg:pb-4">
-    <Header title="About & Mission" />
+    <Header title="About & Mission" userProfile={userProfile} setUserProfile={setUserProfile} />
     
     <div className="bg-white p-6 rounded-xl shadow-sm">
       <h2 className="text-2xl font-bold text-green-700 mb-4">Our Mission</h2>
@@ -971,7 +1141,7 @@ const AboutPage = () => (
   </div>
 );
 
-const MarketplacePage = () => {
+const MarketplacePage = ({ userProfile, setUserProfile }) => {
   const products = [    { 
       id: 1, 
       name: 'Reusable Water Bottle', 
@@ -1165,10 +1335,9 @@ const MarketplacePage = () => {
       window.open(url, '_blank');
     }
   };
-
   return (
     <div className="space-y-6 pb-20 lg:pb-4">
-      <Header title="Eco Marketplace" />
+      <Header title="Eco Marketplace" userProfile={userProfile} setUserProfile={setUserProfile} />
       
       <div className="bg-white p-6 rounded-xl shadow-sm">
         <div className="text-center mb-6">
@@ -1245,7 +1414,7 @@ const MarketplacePage = () => {
   );
 };
 
-const SummaryPage = ({ userStats, habitCompletions }) => {
+const SummaryPage = ({ userStats, habitCompletions, userProfile, setUserProfile }) => {
   const habits = [
     { id: 1, name: 'Reduce Plastic', icon: Recycle, color: 'blue', impact: { water: 5, co2: 2 } },
     { id: 2, name: 'Save Water', icon: Droplet, color: 'sky', impact: { water: 10, co2: 1 } },
@@ -1266,10 +1435,9 @@ const SummaryPage = ({ userStats, habitCompletions }) => {
     { day: 'Sat', habits: 3, co2: 1.5 },
     { day: 'Sun', habits: habitCompletions.size, co2: userStats?.co2Reduced || 0 },
   ];
-
   return (
     <div className="space-y-6 pb-20 lg:pb-4">
-      <Header title="Summary Report" />
+      <Header title="Summary Report" userProfile={userProfile} setUserProfile={setUserProfile} />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-xl shadow-sm text-center">
@@ -1308,7 +1476,7 @@ const SummaryPage = ({ userStats, habitCompletions }) => {
   );
 };
 
-const CommunityPage = () => {
+const CommunityPage = ({ userProfile, setUserProfile }) => {
   const leaderboard = [
     { rank: 1, name: 'GreenGuru', points: 2850, badge: '🏆' },
     { rank: 2, name: 'EcoMaster', points: 2650, badge: '🥈' },
@@ -1316,10 +1484,9 @@ const CommunityPage = () => {
     { rank: 4, name: 'You (EcoWarrior)', points: 1250, badge: '🌱' },
     { rank: 5, name: 'ClimateChamp', points: 1100, badge: '🌍' },
   ];
-
   return (
     <div className="space-y-6 pb-20 lg:pb-4">
-      <Header title="Community Impact" />
+      <Header title="Community Impact" userProfile={userProfile} setUserProfile={setUserProfile} />
       
       <div className="bg-white p-6 rounded-xl shadow-sm">
         <h2 className="text-2xl font-bold text-green-700 mb-4">Global Impact</h2>
@@ -1358,8 +1525,7 @@ const CommunityPage = () => {
           ))}
         </div>
       </div>
-    </div>
-  );
+    </div>  );
 };
 
 export default App;
