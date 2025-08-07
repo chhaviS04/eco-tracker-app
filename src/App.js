@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Home, Leaf, Target, Award, User, Info, CheckCircle, Droplet, Recycle, Lightbulb, Flower2, TrendingUp, Users, ShoppingBag, FileText, Bot, Globe, Settings, Wind, Edit3, X } from 'lucide-react';
 const App = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -40,13 +40,21 @@ const App = () => {
           setUserStats={setUserStats}
           userProfile={userProfile}
           setUserProfile={setUserProfile}
+        />;      case 'goals':
+        return <GoalsPage 
+          userProfile={userProfile} 
+          setUserProfile={setUserProfile} 
+          userStats={userStats}
+          habitCompletions={habitCompletions}
         />;
-      case 'goals':
-        return <GoalsPage userProfile={userProfile} setUserProfile={setUserProfile} />;
       case 'ecoTips':
-        return <EcoTipsPage userProfile={userProfile} setUserProfile={setUserProfile} />;
-      case 'achievements':
-        return <AchievementsPage userProfile={userProfile} setUserProfile={setUserProfile} />;
+        return <EcoTipsPage userProfile={userProfile} setUserProfile={setUserProfile} />;      case 'achievements':
+        return <AchievementsPage 
+          userProfile={userProfile} 
+          setUserProfile={setUserProfile} 
+          userStats={userStats}
+          habitCompletions={habitCompletions}
+        />;
       case 'profile':
         return <ProfilePage userStats={userStats} userProfile={userProfile} setUserProfile={setUserProfile} />;
       case 'about':
@@ -69,14 +77,53 @@ const App = () => {
           setUserProfile={setUserProfile}
         />;
     }
-  };
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-100 font-inter text-gray-800 flex flex-col lg:flex-row relative overflow-hidden">
-      {/* Animated Background Blobs */}
+  };  return (
+    <div className="min-h-screen relative overflow-hidden font-inter text-gray-800 flex flex-col lg:flex-row">
+      {/* Enhanced Animated Background */}
+      <div className="animated-background"></div>
+      
+      {/* Floating Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-green-300/30 to-emerald-400/30 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute top-1/2 right-20 w-96 h-96 bg-gradient-to-r from-blue-300/20 to-cyan-400/20 rounded-full blur-3xl animate-float-delayed"></div>
-        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-gradient-to-r from-purple-300/25 to-pink-400/25 rounded-full blur-3xl animate-pulse-slow"></div>
+        {Array.from({ length: 30 }, (_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white/20 rounded-full animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 10}s`,
+              animationDuration: `${15 + Math.random() * 25}s`,
+              transform: `scale(${0.5 + Math.random() * 1.5})`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Enhanced Floating Blobs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="blob" style={{
+          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3))',
+          width: '400px',
+          height: '400px',
+          top: '10%',
+          left: '10%'
+        }}></div>
+        <div className="blob" style={{
+          background: 'linear-gradient(135deg, rgba(240, 147, 251, 0.25), rgba(245, 87, 108, 0.25))',
+          width: '300px',
+          height: '300px',
+          top: '60%',
+          right: '15%',
+          animationDelay: '-7s'
+        }}></div>
+        <div className="blob" style={{
+          background: 'linear-gradient(135deg, rgba(74, 222, 128, 0.3), rgba(34, 197, 94, 0.3))',
+          width: '350px',
+          height: '350px',
+          bottom: '10%',
+          left: '40%',
+          animationDelay: '-14s'
+        }}></div>
       </div>
 
       <Sidebar setCurrentPage={setCurrentPage} currentPage={currentPage} />
@@ -356,7 +403,13 @@ const AvatarCreationModal = ({ userProfile, setUserProfile, onClose }) => {
 
 const Header = ({ title, userProfile, setUserProfile }) => {
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
-  
+  const [currentTime, setCurrentTime] = useState(new Date());
+    // Update time every minute
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
   // Provide default values if userProfile is not passed
   const defaultProfile = {
     name: 'EcoWarrior',
@@ -367,30 +420,118 @@ const Header = ({ title, userProfile, setUserProfile }) => {
   
   const profile = userProfile || defaultProfile;
   const canEditAvatar = userProfile && setUserProfile;
+
+  const getGreeting = () => {
+    const hour = currentTime.getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    return "Good evening";
+  };
+
+  const getMotivationalQuote = () => {
+    const quotes = [
+      "Every small action makes a big difference! 🌱",
+      "You're making the world greener! 🌍",
+      "Sustainability starts with you! ♻️",
+      "Keep up the amazing eco work! 🌿",
+      "Your planet thanks you! 💚"
+    ];
+    return quotes[Math.floor(Math.random() * quotes.length)];
+  };
   
   return (
-    <>      <header className="flex items-center justify-between p-4 glass-card shadow-lg hover:shadow-xl rounded-xl mb-6 transition-all duration-300 animate-slide-up">
-        <h1 className="text-2xl font-bold text-green-700">{title}</h1>
-        <div className="flex items-center space-x-3">
-          <span className="text-lg font-medium hidden sm:block">Welcome, {profile.name}!</span>
-          <button
-            onClick={() => canEditAvatar && setIsAvatarModalOpen(true)}
-            className={`relative group ${canEditAvatar ? 'cursor-pointer' : 'cursor-default'}`}
-          >
-            <div className={`w-10 h-10 ${profile.avatarColor} rounded-full flex items-center justify-center text-white font-bold text-xl ring-2 ring-green-500 ${canEditAvatar ? 'hover:ring-green-600 hover:scale-105' : ''} transition-all duration-200`}>
-              {profile.avatarIcon ? (
-                <profile.avatarIcon className="w-6 h-6" />
-              ) : (
-                profile.initials
+    <>
+      <header className="glass-card p-6 rounded-xl shadow-lg mb-6 relative overflow-hidden card-hover-lift animate-slide-up">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-green-400/20 to-emerald-400/20 transform rotate-12 scale-150"></div>
+        </div>
+        
+        <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+          {/* Title Section */}
+          <div className="space-y-2">
+            <div className="flex items-center space-x-3">
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-green-800 to-emerald-700 bg-clip-text text-transparent animate-slide-left">
+                {title}
+              </h1>
+              
+              {/* Status Indicator */}
+              <div className="flex items-center space-x-2 px-3 py-1 bg-green-100/50 rounded-full animate-slide-right">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-xs text-green-700 font-medium">Live</span>
+              </div>
+            </div>
+            
+            {/* Greeting and Quote */}
+            <div className="space-y-1">
+              <p className="text-gray-600 animate-slide-left" style={{ animationDelay: '0.2s' }}>
+                {getGreeting()}, <span className="font-semibold text-green-700">{profile.name}</span>!
+              </p>
+              <p className="text-sm text-gray-500 animate-slide-left" style={{ animationDelay: '0.4s' }}>
+                {getMotivationalQuote()}
+              </p>
+            </div>
+          </div>
+
+          {/* User Profile Section */}
+          <div className="flex items-center space-x-4">
+            {/* Time Display */}
+            <div className="hidden sm:block text-right">
+              <div className="text-sm text-gray-500">
+                {currentTime.toLocaleDateString('en-US', { 
+                  weekday: 'short', 
+                  month: 'short', 
+                  day: 'numeric' 
+                })}
+              </div>
+              <div className="text-lg font-bold text-gray-700">
+                {currentTime.toLocaleTimeString('en-US', { 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
+              </div>
+            </div>
+            
+            {/* Enhanced Avatar */}
+            <div className="relative group">
+              <button
+                onClick={() => canEditAvatar && setIsAvatarModalOpen(true)}
+                className={`w-14 h-14 ${profile.avatarColor} rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 ring-4 ring-white/30 hover:ring-green-400/50 micro-bounce ${canEditAvatar ? 'cursor-pointer' : 'cursor-default'}`}
+              >
+                {profile.avatarIcon ? (
+                  <span className="text-2xl">{profile.avatarIcon}</span>
+                ) : (
+                  profile.initials
+                )}
+              </button>
+              
+              {/* Status indicator */}
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full animate-pulse"></div>
+              
+              {/* Hover tooltip */}
+              {canEditAvatar && (
+                <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+                  Edit Profile
+                </div>
               )}
             </div>
+
+            {/* Edit Button */}
             {canEditAvatar && (
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <Edit3 className="w-2.5 h-2.5 text-white" />
-              </div>
+              <button
+                onClick={() => setIsAvatarModalOpen(true)}
+                className="p-2 glass-morphism rounded-lg hover:bg-white/20 transition-all duration-300 transform hover:scale-105 micro-bounce"
+                title="Customize Avatar"
+              >
+                <Edit3 className="w-5 h-5 text-gray-600" />
+              </button>
             )}
-          </button>
+          </div>
         </div>
+
+        {/* Decorative Elements */}
+        <div className="absolute top-4 right-4 w-20 h-20 bg-gradient-to-br from-green-400/10 to-emerald-400/10 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-4 left-4 w-16 h-16 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-xl"></div>
       </header>
 
       {isAvatarModalOpen && canEditAvatar && (
@@ -417,34 +558,68 @@ const Sidebar = ({ setCurrentPage, currentPage }) => {
     { name: 'Marketplace', icon: ShoppingBag, page: 'marketplace' },
     { name: 'Summary Report', icon: FileText, page: 'summary' },
   ];
-
   return (
-    <aside className="hidden lg:block w-64 bg-white shadow-lg rounded-2xl m-4 p-6 flex flex-col justify-between">
+    <aside className="hidden lg:block w-64 glass-card m-4 p-6 flex flex-col justify-between relative z-20 card-hover-lift">
+      {/* Sidebar Header with Enhanced Logo */}
       <div>
-        <div className="flex items-center mb-10">
-          <Leaf className="w-10 h-10 text-green-600 mr-3" />
-          <h2 className="text-3xl font-extrabold text-green-800">EcoTracker</h2>
+        <div className="flex items-center mb-10 group">
+          <div className="relative">
+            <Leaf className="w-10 h-10 text-green-600 mr-3 transform group-hover:scale-110 transition-transform duration-300" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          </div>
+          <h2 className="text-3xl font-extrabold bg-gradient-to-r from-green-800 to-emerald-700 bg-clip-text text-transparent">
+            EcoTracker
+          </h2>
         </div>
+        
+        {/* Navigation */}
         <nav>
-          <ul>
-            {navItems.map((item) => (
-              <li key={item.name} className="mb-3">
+          <ul className="space-y-2">
+            {navItems.map((item, index) => (
+              <li key={item.name} className="animate-slide-left" style={{ animationDelay: `${index * 0.1}s` }}>
                 <button
                   onClick={() => setCurrentPage(item.page)}
-                  className={`flex items-center w-full p-3 rounded-lg transition-all duration-200 ease-in-out
-                    ${currentPage === item.page ? 'bg-green-100 text-green-700 font-semibold shadow-inner' : 'text-gray-600 hover:bg-green-50 hover:text-green-600'}
-                  `}
+                  className={`flex items-center w-full p-3 rounded-xl transition-all duration-300 ease-in-out group relative micro-bounce ${
+                    currentPage === item.page 
+                      ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold shadow-lg transform scale-105' 
+                      : 'text-gray-700 hover:bg-white/30 hover:text-green-600 hover:transform hover:translate-x-1'
+                  }`}
                 >
-                  <item.icon className="w-5 h-5 mr-3" />
-                  <span>{item.name}</span>
+                  {/* Active indicator */}
+                  {currentPage === item.page && (
+                    <div className="absolute -left-1 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-white rounded-full animate-scale-in"></div>
+                  )}
+                  
+                  <item.icon className={`w-5 h-5 mr-3 transition-transform duration-300 ${
+                    currentPage === item.page ? 'text-white' : 'group-hover:scale-110'
+                  }`} />
+                  <span className="relative overflow-hidden">
+                    {item.name}
+                    {/* Hover underline effect */}
+                    <div className={`absolute bottom-0 left-0 w-full h-0.5 bg-green-500 transform scale-x-0 transition-transform duration-300 ${
+                      currentPage !== item.page ? 'group-hover:scale-x-100' : ''
+                    }`}></div>
+                  </span>
+                  
+                  {/* Notification badges for specific items */}
+                  {(item.page === 'achievements' || item.page === 'community') && (
+                    <div className="ml-auto w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                  )}
                 </button>
               </li>
             ))}
           </ul>
         </nav>
       </div>
-      <div className="mt-8 text-sm text-gray-500">
-        <p>&copy; 2025 EcoTracker. All rights reserved.</p>
+      
+      {/* Enhanced Footer */}
+      <div className="mt-8 text-sm text-gray-500 space-y-2">
+        <div className="flex items-center justify-center space-x-2 p-2 bg-white/10 rounded-lg">
+          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          <span className="text-xs">Online</span>
+        </div>
+        <p className="text-center">&copy; 2025 EcoTracker</p>
+        <p className="text-xs text-center opacity-75">Making Earth greener, one habit at a time 🌱</p>
       </div>
     </aside>
   );
@@ -458,19 +633,60 @@ const Navbar = ({ setCurrentPage, currentPage }) => {
     { name: 'Goals', icon: Target, page: 'goals' },
     { name: 'Profile', icon: User, page: 'profile' },
   ];
-
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white shadow-lg p-3 flex justify-around lg:hidden z-50 rounded-t-xl">
-      {navItems.map((item) => (
+    <nav className="fixed bottom-0 left-0 right-0 glass-morphism p-3 flex justify-around lg:hidden z-50 rounded-t-2xl border-t border-white/20">
+      {navItems.map((item, index) => (
         <button
           key={item.name}
           onClick={() => setCurrentPage(item.page)}
-          className={`flex flex-col items-center p-2 rounded-lg transition-all duration-200 ease-in-out
-            ${currentPage === item.page ? 'text-green-700 font-semibold' : 'text-gray-500 hover:text-green-600'}
-          `}
+          className={`flex flex-col items-center p-2 rounded-xl transition-all duration-300 ease-in-out relative micro-bounce group ${
+            currentPage === item.page 
+              ? 'text-green-600 font-semibold transform scale-110' 
+              : 'text-gray-500 hover:text-green-600 hover:scale-105'
+          }`}
+          style={{ animationDelay: `${index * 0.1}s` }}
         >
-          <item.icon className="w-6 h-6 mb-1" />
-          <span className="text-xs">{item.name}</span>
+          {/* Active background */}
+          {currentPage === item.page && (
+            <div className="absolute inset-0 bg-gradient-to-t from-green-100/50 to-green-50/30 rounded-xl animate-scale-in"></div>
+          )}
+          
+          {/* Icon with enhanced styling */}
+          <div className={`relative p-2 rounded-lg transition-all duration-300 ${
+            currentPage === item.page 
+              ? 'bg-green-100/50 shadow-lg' 
+              : 'group-hover:bg-white/20'
+          }`}>
+            <item.icon className={`w-6 h-6 transition-all duration-300 ${
+              currentPage === item.page 
+                ? 'text-green-600 drop-shadow-sm' 
+                : 'group-hover:scale-110'
+            }`} />
+            
+            {/* Pulse effect for active item */}
+            {currentPage === item.page && (
+              <div className="absolute inset-0 bg-green-400/20 rounded-lg animate-ping"></div>
+            )}
+          </div>
+          
+          {/* Label with enhanced typography */}
+          <span className={`text-xs mt-1 transition-all duration-300 relative ${
+            currentPage === item.page ? 'font-semibold' : ''
+          }`}>
+            {item.name}
+            
+            {/* Active indicator dot */}
+            {currentPage === item.page && (
+              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-green-500 rounded-full animate-scale-in"></div>
+            )}
+          </span>
+          
+          {/* Notification badges */}
+          {(item.page === 'habits' || item.page === 'goals') && (
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-400 rounded-full flex items-center justify-center">
+              <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+            </div>
+          )}
         </button>
       ))}
     </nav>
@@ -1049,55 +1265,85 @@ Want the full details? Check out the Eco Tips section on your dashboard!`;
 };
 
 const HabitCard = ({ habit, isCompleted, onLogHabit }) => (
-  <div className={`p-4 rounded-lg flex flex-col items-center text-center shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 glass-card animate-scale-in relative overflow-hidden ${
+  <div className={`p-6 rounded-xl flex flex-col items-center text-center shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 glass-card animate-scale-in relative overflow-hidden group ${
     isCompleted ? 'ring-2 ring-green-300 animate-shimmer' : 'hover:ring-2 hover:ring-green-200'
   }`}>
     {/* Celebration overlay for completed habits */}
     {isCompleted && (
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1 right-1 animate-sparkle">✨</div>
-        <div className="absolute top-1 left-1 animate-sparkle" style={{ animationDelay: '0.5s' }}>✨</div>
-        <div className="absolute bottom-1 right-1 animate-sparkle" style={{ animationDelay: '1s' }}>✨</div>
-        <div className="absolute bottom-1 left-1 animate-sparkle" style={{ animationDelay: '1.5s' }}>✨</div>
-      </div>
+      <>
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-2 right-2 animate-sparkle">✨</div>
+          <div className="absolute top-2 left-2 animate-sparkle" style={{ animationDelay: '0.5s' }}>✨</div>
+          <div className="absolute bottom-2 right-2 animate-sparkle" style={{ animationDelay: '1s' }}>✨</div>
+          <div className="absolute bottom-2 left-2 animate-sparkle" style={{ animationDelay: '1.5s' }}>✨</div>
+        </div>
+        
+        {/* Success glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-green-400/10 to-emerald-400/10 rounded-xl animate-pulse-glow"></div>
+      </>
     )}
     
-    <div className={`p-3 rounded-full bg-${habit.color}-200 text-${habit.color}-700 mb-3 transition-all duration-300 relative ${
-      isCompleted ? 'ring-2 ring-green-400 animate-pulse' : 'hover:scale-110'
+    {/* Enhanced Icon Container */}
+    <div className={`relative p-4 rounded-full bg-${habit.color}-200 text-${habit.color}-700 mb-4 transition-all duration-500 ${
+      isCompleted ? 'ring-3 ring-green-400 animate-pulse scale-110' : 'hover:scale-125 group-hover:rotate-12'
     }`}>
-      <habit.icon className="w-8 h-8" />
+      <habit.icon className="w-10 h-10 transition-all duration-300" />
+      
+      {/* Completion checkmark */}
       {isCompleted && (
-        <div className="absolute -top-1 -right-1 text-green-500 animate-bounce-in">
-          <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-xs">✓</span>
+        <div className="absolute -top-2 -right-2 text-green-500 animate-bounce-in">
+          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+            <span className="text-white text-sm font-bold">✓</span>
           </div>
         </div>
       )}
+      
+      {/* Hover glow effect */}
+      <div className={`absolute inset-0 rounded-full transition-opacity duration-300 ${
+        isCompleted 
+          ? `bg-green-400/20 animate-pulse` 
+          : `bg-${habit.color}-400/0 group-hover:bg-${habit.color}-400/20`
+      }`}></div>
     </div>
     
-    <h3 className="text-lg font-semibold text-gray-800 mb-2">{habit.name}</h3>
+    {/* Enhanced Title */}
+    <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-green-700 transition-colors duration-300">
+      {habit.name}
+    </h3>
     
+    {/* Completion Status */}
     {isCompleted && (
-      <div className="flex items-center text-green-600 mb-2 animate-slide-up">
-        <CheckCircle className="w-5 h-5 mr-1" />
-        <span className="text-sm font-medium">Completed!</span>
-        <span className="ml-1 animate-celebration">🎉</span>
+      <div className="flex items-center text-green-600 mb-3 animate-slide-up">
+        <CheckCircle className="w-5 h-5 mr-2" />
+        <span className="text-sm font-semibold">Completed!</span>
+        <span className="ml-2 animate-celebration text-lg">🎉</span>
       </div>
     )}
     
+    {/* Enhanced Button */}
     <button 
       onClick={() => onLogHabit(habit.id)}
-      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 relative overflow-hidden ${
+      className={`btn-modern px-6 py-3 rounded-xl text-sm font-bold transition-all duration-500 shadow-lg hover:shadow-2xl transform hover:scale-110 micro-bounce relative overflow-hidden ${
         isCompleted
-          ? 'bg-green-600 text-white hover:bg-green-700'
-          : 'bg-green-500 text-white hover:bg-green-600'
+          ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 animate-pulse-glow'
+          : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600'
       }`}
     >
-      {isCompleted ? 'Logged ✓' : 'Log Habit'}
-      {!isCompleted && (
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full hover:translate-x-full transition-transform duration-700"></div>
-      )}
+      <span className="relative z-10">
+        {isCompleted ? 'Logged ✓' : 'Log Habit'}
+      </span>
+      
+      {/* Button shine effect */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+      
+      {/* Ripple effect */}
+      <div className="absolute inset-0 bg-white/10 rounded-xl opacity-0 group-active:opacity-100 group-active:animate-ping transition-opacity duration-300"></div>
     </button>
+    
+    {/* Progress indicator */}
+    <div className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r from-green-400 to-emerald-400 transition-all duration-700 ${
+      isCompleted ? 'w-full' : 'w-0 group-hover:w-1/3'
+    }`}></div>
   </div>
 );
 
@@ -1288,39 +1534,151 @@ const HabitsPage = ({ habitCompletions, setHabitCompletions, userStats, setUserS
   );
 };
 
-const GoalsPage = ({ userProfile, setUserProfile }) => {
+const GoalsPage = ({ userProfile, setUserProfile, userStats, habitCompletions }) => {
+  // Calculate current progress based on actual user stats
+  const getCurrentProgress = (goalType) => {
+    switch (goalType) {
+      case 'water':
+        return userStats?.waterSaved || 0;
+      case 'plastic':
+        return userStats?.currentStreak || 0; // Using streak for consistency
+      case 'carbon':
+        return userStats?.co2Reduced || 0;
+      default:
+        return 0;
+    }
+  };
+
   const goals = [
-    { id: 1, title: 'Reduce Water Usage', target: 100, current: 65, unit: 'liters saved' },
-    { id: 2, title: 'Plastic-Free Week', target: 7, current: 3, unit: 'days completed' },
-    { id: 3, title: 'Carbon Footprint', target: 50, current: 32, unit: 'kg CO2 reduced' },
-  ];
-  return (
+    { 
+      id: 1, 
+      title: 'Reduce Water Usage', 
+      target: 100, 
+      current: getCurrentProgress('water'), 
+      unit: 'liters saved',
+      type: 'water',
+      icon: '💧',
+      description: 'Save water by completing water-related habits'
+    },
+    { 
+      id: 2, 
+      title: 'Build Habit Streak', 
+      target: 7, 
+      current: getCurrentProgress('plastic'), 
+      unit: 'days streak',
+      type: 'streak',
+      icon: '🔥',
+      description: 'Maintain consistent daily habits'
+    },
+    { 
+      id: 3, 
+      title: 'Reduce Carbon Footprint', 
+      target: 50, 
+      current: getCurrentProgress('carbon'), 
+      unit: 'kg CO2 reduced',
+      type: 'carbon',
+      icon: '🌍',
+      description: 'Lower your environmental impact'
+    },
+  ];  return (
     <div className="space-y-6 pb-20 lg:pb-4">
       <Header title="Environmental Goals" userProfile={userProfile} setUserProfile={setUserProfile} />
       
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <h2 className="text-2xl font-bold text-green-700 mb-4">Current Goals</h2>
-        <div className="space-y-4">
+      <div className="glass-card p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+        <h2 className="text-2xl font-bold text-green-700 mb-6">Your Environmental Goals</h2>
+        
+        <div className="space-y-6">
           {goals.map((goal) => {
             const progress = (goal.current / goal.target) * 100;
+            const isCompleted = progress >= 100;
+            
             return (
-              <div key={goal.id} className="p-4 border rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-semibold text-gray-800">{goal.title}</h3>
-                  <span className="text-sm text-gray-500">{Math.round(progress)}%</span>
+              <div key={goal.id} className={`p-6 border-2 rounded-xl transition-all duration-300 transform hover:scale-105 ${
+                isCompleted 
+                  ? 'border-green-300 bg-green-50 shadow-lg' 
+                  : 'border-gray-200 bg-white hover:border-green-200'
+              }`}>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-3xl">{goal.icon}</span>
+                    <div>
+                      <h3 className="text-xl font-semibold text-gray-800">{goal.title}</h3>
+                      <p className="text-sm text-gray-600">{goal.description}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className={`text-2xl font-bold ${
+                      isCompleted ? 'text-green-600' : 'text-gray-700'
+                    }`}>
+                      {Math.round(progress)}%
+                    </span>
+                    {isCompleted && (
+                      <div className="flex items-center text-green-600 mt-1">
+                        <span className="text-sm font-medium">Completed!</span>
+                        <span className="ml-1 animate-bounce">🎉</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+                
+                <div className="w-full bg-gray-200 rounded-full h-4 mb-3 overflow-hidden">
                   <div 
-                    className="bg-green-500 h-3 rounded-full transition-all duration-300"
+                    className={`h-4 rounded-full transition-all duration-700 ease-in-out ${
+                      isCompleted 
+                        ? 'bg-gradient-to-r from-green-400 to-green-600 animate-shimmer' 
+                        : progress > 50 
+                          ? 'bg-gradient-to-r from-yellow-400 to-green-500'
+                          : 'bg-gradient-to-r from-blue-400 to-green-400'
+                    }`}
                     style={{ width: `${Math.min(progress, 100)}%` }}
                   ></div>
                 </div>
-                <p className="text-sm text-gray-600">
-                  {goal.current} / {goal.target} {goal.unit}
-                </p>
+                
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-gray-600">
+                    <span className="font-semibold text-green-600">{goal.current.toFixed(goal.type === 'carbon' ? 1 : 0)}</span> / {goal.target} {goal.unit}
+                  </p>
+                  {!isCompleted && (
+                    <p className="text-xs text-gray-500">
+                      {(goal.target - goal.current).toFixed(goal.type === 'carbon' ? 1 : 0)} {goal.unit} to go
+                    </p>
+                  )}
+                </div>
+                
+                {/* Progress milestones */}
+                <div className="mt-4 flex justify-between text-xs text-gray-400">
+                  <span className={progress >= 25 ? 'text-green-500 font-medium' : ''}>25%</span>
+                  <span className={progress >= 50 ? 'text-green-500 font-medium' : ''}>50%</span>
+                  <span className={progress >= 75 ? 'text-green-500 font-medium' : ''}>75%</span>
+                  <span className={progress >= 100 ? 'text-green-500 font-medium' : ''}>100%</span>
+                </div>
               </div>
             );
           })}
+        </div>
+        
+        {/* Motivational section */}
+        <div className="mt-8 p-6 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+          <h3 className="text-lg font-semibold text-green-800 mb-2">🌱 Keep Going!</h3>
+          <p className="text-green-700 text-sm">
+            Every small action contributes to a bigger impact. Complete your daily habits to progress towards these goals!
+          </p>
+          
+          {/* Quick stats */}
+          <div className="mt-4 grid grid-cols-3 gap-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-green-600">{userStats?.totalHabitsCompleted || 0}</div>
+              <div className="text-xs text-gray-600">Total Habits</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-blue-600">{habitCompletions?.size || 0}</div>
+              <div className="text-xs text-gray-600">Today's Habits</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-orange-600">{userStats?.currentStreak || 0}</div>
+              <div className="text-xs text-gray-600">Current Streak</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1361,46 +1719,370 @@ const EcoTipsPage = ({ userProfile, setUserProfile }) => {
   );
 };
 
-const AchievementsPage = ({ userProfile, setUserProfile }) => {
+const AchievementsPage = ({ userProfile, setUserProfile, userStats, habitCompletions }) => {
+  const [newlyUnlocked, setNewlyUnlocked] = useState([]);
+  
+  // Calculate achievement progress based on actual user stats
+  const checkAchievementUnlock = (achievement) => {
+    switch (achievement.id) {
+      case 1: // Water Warrior - Save 50+ liters of water
+        return (userStats?.waterSaved || 0) >= 50;
+      case 2: // First Steps - Complete first habit
+        return (userStats?.totalHabitsCompleted || 0) >= 1;
+      case 3: // Streak Starter - Achieve 3-day streak
+        return (userStats?.currentStreak || 0) >= 3;
+      case 4: // Green Champion - Complete 10 total habits
+        return (userStats?.totalHabitsCompleted || 0) >= 10;
+      case 5: // Perfect Day - Complete all 6 habits in one day
+        return habitCompletions?.size >= 6;
+      case 6: // Carbon Saver - Reduce 25kg CO2
+        return (userStats?.co2Reduced || 0) >= 25;
+      case 7: // Consistency King - Achieve 7-day streak
+        return (userStats?.longestStreak || 0) >= 7;
+      case 8: // Eco Master - Complete 50 total habits
+        return (userStats?.totalHabitsCompleted || 0) >= 50;
+      case 9: // Water Guardian - Save 100+ liters
+        return (userStats?.waterSaved || 0) >= 100;
+      case 10: // Planet Protector - Reduce 50kg CO2
+        return (userStats?.co2Reduced || 0) >= 50;
+      default:
+        return false;
+    }
+  };
+
   const achievements = [
-    { id: 1, title: 'Water Warrior', description: 'Saved 500+ liters of water', icon: Droplet, unlocked: true },
-    { id: 2, title: 'Plastic Fighter', description: 'Avoided plastic for 7 days', icon: Recycle, unlocked: true },
-    { id: 3, title: 'Green Commuter', description: 'Used public transport 20 times', icon: TrendingUp, unlocked: false },
-    { id: 4, title: 'Energy Saver', description: 'Reduced energy usage by 30%', icon: Lightbulb, unlocked: true },
-    { id: 5, title: 'Eco Master', description: 'Complete all habits for 30 days', icon: Award, unlocked: false },
-    { id: 6, title: 'Plant Parent', description: 'Started composting', icon: Flower2, unlocked: false },
+    { 
+      id: 1, 
+      title: 'Water Warrior', 
+      description: 'Save 50+ liters of water', 
+      icon: Droplet, 
+      color: 'blue',
+      emoji: '💧',
+      rarity: 'common'
+    },
+    { 
+      id: 2, 
+      title: 'First Steps', 
+      description: 'Complete your first eco habit', 
+      icon: CheckCircle, 
+      color: 'green',
+      emoji: '🌱',
+      rarity: 'common'
+    },
+    { 
+      id: 3, 
+      title: 'Streak Starter', 
+      description: 'Achieve a 3-day habit streak', 
+      icon: TrendingUp, 
+      color: 'orange',
+      emoji: '🔥',
+      rarity: 'common'
+    },
+    { 
+      id: 4, 
+      title: 'Green Champion', 
+      description: 'Complete 10 total habits', 
+      icon: Award, 
+      color: 'yellow',
+      emoji: '🏆',
+      rarity: 'uncommon'
+    },
+    { 
+      id: 5, 
+      title: 'Perfect Day', 
+      description: 'Complete all 6 habits in one day', 
+      icon: CheckCircle, 
+      color: 'purple',
+      emoji: '⭐',
+      rarity: 'rare'
+    },
+    { 
+      id: 6, 
+      title: 'Carbon Saver', 
+      description: 'Reduce 25kg of CO₂ emissions', 
+      icon: Wind, 
+      color: 'teal',
+      emoji: '🌪️',
+      rarity: 'uncommon'
+    },
+    { 
+      id: 7, 
+      title: 'Consistency King', 
+      description: 'Achieve a 7-day habit streak', 
+      icon: TrendingUp, 
+      color: 'red',
+      emoji: '👑',
+      rarity: 'rare'
+    },
+    { 
+      id: 8, 
+      title: 'Eco Master', 
+      description: 'Complete 50 total habits', 
+      icon: Leaf, 
+      color: 'emerald',
+      emoji: '🌿',
+      rarity: 'epic'
+    },
+    { 
+      id: 9, 
+      title: 'Water Guardian', 
+      description: 'Save 100+ liters of water', 
+      icon: Droplet, 
+      color: 'cyan',
+      emoji: '🛡️',
+      rarity: 'rare'
+    },
+    { 
+      id: 10, 
+      title: 'Planet Protector', 
+      description: 'Reduce 50kg of CO₂ emissions', 
+      icon: Globe, 
+      color: 'indigo',
+      emoji: '🌍',
+      rarity: 'epic'
+    },
   ];
+
+  // Add unlock status to achievements
+  const achievementsWithStatus = achievements.map(achievement => ({
+    ...achievement,
+    unlocked: checkAchievementUnlock(achievement),
+    progress: getAchievementProgress(achievement)
+  }));
+
+  function getAchievementProgress(achievement) {
+    switch (achievement.id) {
+      case 1: // Water Warrior
+        return Math.min(((userStats?.waterSaved || 0) / 50) * 100, 100);
+      case 2: // First Steps
+        return (userStats?.totalHabitsCompleted || 0) >= 1 ? 100 : 0;
+      case 3: // Streak Starter
+        return Math.min(((userStats?.currentStreak || 0) / 3) * 100, 100);
+      case 4: // Green Champion
+        return Math.min(((userStats?.totalHabitsCompleted || 0) / 10) * 100, 100);
+      case 5: // Perfect Day
+        return Math.min(((habitCompletions?.size || 0) / 6) * 100, 100);
+      case 6: // Carbon Saver
+        return Math.min(((userStats?.co2Reduced || 0) / 25) * 100, 100);
+      case 7: // Consistency King
+        return Math.min(((userStats?.longestStreak || 0) / 7) * 100, 100);
+      case 8: // Eco Master
+        return Math.min(((userStats?.totalHabitsCompleted || 0) / 50) * 100, 100);
+      case 9: // Water Guardian
+        return Math.min(((userStats?.waterSaved || 0) / 100) * 100, 100);
+      case 10: // Planet Protector
+        return Math.min(((userStats?.co2Reduced || 0) / 50) * 100, 100);
+      default:
+        return 0;
+    }
+  }
+
+  const getRarityColor = (rarity) => {
+    switch (rarity) {
+      case 'common': return 'from-gray-400 to-gray-600';
+      case 'uncommon': return 'from-green-400 to-green-600';
+      case 'rare': return 'from-blue-400 to-blue-600';
+      case 'epic': return 'from-purple-400 to-purple-600';
+      case 'legendary': return 'from-yellow-400 to-yellow-600';
+      default: return 'from-gray-400 to-gray-600';
+    }
+  };
+
+  const unlockedCount = achievementsWithStatus.filter(a => a.unlocked).length;
+  const totalAchievements = achievements.length;
+
   return (
-    <div className="space-y-6 pb-20 lg:pb-4">
+    <div className="space-y-6 pb-20 lg:pb-4 animate-slide-up">
       <Header title="Achievements" userProfile={userProfile} setUserProfile={setUserProfile} />
       
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <h2 className="text-2xl font-bold text-green-700 mb-4">Your Badges</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {achievements.map((achievement) => (
-            <div key={achievement.id} className={`p-4 border rounded-lg text-center ${
-              achievement.unlocked ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'
-            }`}>
-              <achievement.icon className={`w-12 h-12 mx-auto mb-3 ${
-                achievement.unlocked ? 'text-green-600' : 'text-gray-400'
-              }`} />
-              <h3 className={`text-lg font-semibold mb-2 ${
+      {/* Achievement Overview */}
+      <div className="glass-card p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 card-hover-lift">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-green-800 to-emerald-700 bg-clip-text text-transparent">
+              Your Achievements
+            </h2>
+            <p className="text-gray-600 mt-1">
+              Unlock badges by completing eco-friendly actions
+            </p>
+          </div>
+          
+          <div className="text-right">
+            <div className="text-4xl font-bold text-green-700">
+              {unlockedCount}/{totalAchievements}
+            </div>
+            <div className="text-sm text-gray-500">Unlocked</div>
+            <div className="w-20 h-2 bg-gray-200 rounded-full mt-2 overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-700"
+                style={{ width: `${(unlockedCount / totalAchievements) * 100}%` }}
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Achievement Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center p-3 bg-green-50/50 rounded-lg">
+            <div className="text-2xl font-bold text-green-700">
+              {achievementsWithStatus.filter(a => a.rarity === 'common' && a.unlocked).length}
+            </div>
+            <div className="text-xs text-gray-600">Common</div>
+          </div>
+          <div className="text-center p-3 bg-blue-50/50 rounded-lg">
+            <div className="text-2xl font-bold text-blue-700">
+              {achievementsWithStatus.filter(a => a.rarity === 'uncommon' && a.unlocked).length}
+            </div>
+            <div className="text-xs text-gray-600">Uncommon</div>
+          </div>
+          <div className="text-center p-3 bg-purple-50/50 rounded-lg">
+            <div className="text-2xl font-bold text-purple-700">
+              {achievementsWithStatus.filter(a => a.rarity === 'rare' && a.unlocked).length}
+            </div>
+            <div className="text-xs text-gray-600">Rare</div>
+          </div>
+          <div className="text-center p-3 bg-yellow-50/50 rounded-lg">
+            <div className="text-2xl font-bold text-yellow-700">
+              {achievementsWithStatus.filter(a => a.rarity === 'epic' && a.unlocked).length}
+            </div>
+            <div className="text-xs text-gray-600">Epic</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Achievements Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {achievementsWithStatus.map((achievement, index) => (
+          <div 
+            key={achievement.id} 
+            className={`glass-card p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 relative overflow-hidden animate-slide-up ${
+              achievement.unlocked ? 'ring-2 ring-green-300' : ''
+            }`}
+            style={{ animationDelay: `${index * 0.1}s` }}
+          >
+            {/* Rarity Border */}
+            <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${getRarityColor(achievement.rarity)}`}></div>
+            
+            {/* Unlock Sparkles */}
+            {achievement.unlocked && (
+              <>
+                <div className="absolute top-2 right-2 animate-sparkle text-yellow-400">✨</div>
+                <div className="absolute top-2 left-2 animate-sparkle text-yellow-400" style={{ animationDelay: '0.5s' }}>✨</div>
+                <div className="absolute bottom-2 right-2 animate-sparkle text-yellow-400" style={{ animationDelay: '1s' }}>✨</div>
+                <div className="absolute bottom-2 left-2 animate-sparkle text-yellow-400" style={{ animationDelay: '1.5s' }}>✨</div>
+              </>
+            )}
+
+            <div className="text-center relative z-10">
+              {/* Achievement Icon */}
+              <div className={`relative mx-auto mb-4 w-20 h-20 rounded-full flex items-center justify-center transition-all duration-500 ${
+                achievement.unlocked 
+                  ? `bg-${achievement.color}-100 text-${achievement.color}-600 animate-pulse-glow shadow-lg` 
+                  : 'bg-gray-100 text-gray-400'
+              }`}>
+                <achievement.icon className="w-10 h-10" />
+                
+                {/* Emoji overlay */}
+                <div className={`absolute -top-2 -right-2 text-2xl transition-all duration-300 ${
+                  achievement.unlocked ? 'scale-100 animate-bounce' : 'scale-0'
+                }`}>
+                  {achievement.emoji}
+                </div>
+                
+                {/* Lock overlay for locked achievements */}
+                {!achievement.unlocked && (
+                  <div className="absolute inset-0 bg-gray-200/50 rounded-full flex items-center justify-center">
+                    <span className="text-2xl">🔒</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Achievement Title */}
+              <h3 className={`text-xl font-bold mb-2 transition-colors duration-300 ${
                 achievement.unlocked ? 'text-green-700' : 'text-gray-500'
               }`}>
                 {achievement.title}
               </h3>
-              <p className={`text-sm ${
+
+              {/* Rarity Badge */}
+              <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-3 bg-gradient-to-r ${getRarityColor(achievement.rarity)} text-white uppercase tracking-wider`}>
+                {achievement.rarity}
+              </div>
+
+              {/* Description */}
+              <p className={`text-sm mb-4 ${
                 achievement.unlocked ? 'text-green-600' : 'text-gray-400'
               }`}>
                 {achievement.description}
               </p>
-              {achievement.unlocked && (
-                <span className="inline-block mt-2 px-2 py-1 bg-green-500 text-white text-xs rounded-full">
+
+              {/* Progress Bar */}
+              <div className="mb-4">
+                <div className="flex justify-between text-xs text-gray-500 mb-1">
+                  <span>Progress</span>
+                  <span>{Math.round(achievement.progress)}%</span>
+                </div>
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full transition-all duration-700 ${
+                      achievement.unlocked 
+                        ? 'bg-gradient-to-r from-green-500 to-emerald-500 animate-shimmer' 
+                        : 'bg-gradient-to-r from-gray-400 to-gray-500'
+                    }`}
+                    style={{ width: `${achievement.progress}%` }}
+                  ></div>
+                </div>
+              </div>
+
+              {/* Status Badge */}
+              {achievement.unlocked ? (
+                <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold rounded-full shadow-lg animate-pulse-glow">
+                  <span className="mr-2">🎉</span>
                   Unlocked!
-                </span>
+                </div>
+              ) : (
+                <div className="inline-flex items-center px-4 py-2 bg-gray-300 text-gray-600 text-sm font-medium rounded-full">
+                  <span className="mr-2">🔒</span>
+                  Locked
+                </div>
               )}
             </div>
-          ))}
+          </div>
+        ))}
+      </div>
+
+      {/* Motivational Section */}
+      <div className="glass-card p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+        <div className="text-center">
+          <h3 className="text-2xl font-bold text-green-800 mb-3">🌟 Keep Going!</h3>
+          <p className="text-gray-600 mb-4">
+            Every habit you complete brings you closer to unlocking new achievements. 
+            Your planet-saving journey is making a real difference!
+          </p>
+          
+          {unlockedCount === 0 && (
+            <div className="bg-blue-50/50 p-4 rounded-lg">
+              <p className="text-blue-700 font-medium">
+                🌱 Start by completing your first habit to unlock "First Steps"!
+              </p>
+            </div>
+          )}
+          
+          {unlockedCount > 0 && unlockedCount < totalAchievements && (
+            <div className="bg-green-50/50 p-4 rounded-lg">
+              <p className="text-green-700 font-medium">
+                Amazing progress! You've unlocked {unlockedCount} out of {totalAchievements} achievements. Keep building those eco-habits! 🌍
+              </p>
+            </div>
+          )}
+          
+          {unlockedCount === totalAchievements && (
+            <div className="bg-yellow-50/50 p-4 rounded-lg">
+              <p className="text-yellow-700 font-medium">
+                🏆 Incredible! You've unlocked ALL achievements! You're a true Environmental Champion! 🌟
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
