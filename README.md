@@ -71,9 +71,6 @@ This app helps users:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -82,8 +79,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Built with [Create React App](https://create-react-app.dev/)
 
 ## 📞 Contact
-
-Your Name - your.email@example.com
 
 Project Link: [https://eco-tracker-c9er2y76r-chhavis04s-projects.vercel.app/](https://eco-tracker-c9er2y76r-chhavis04s-projects.vercel.app/)
 
